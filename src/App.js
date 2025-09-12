@@ -1,25 +1,22 @@
-import logo from './logo.svg';
-import './App.css';
+// App.js
+import React, { useState } from "react";
+import PatientTable from "./components/PatientTable";
+import TabsPanel from "./components/TabsPanel";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [selectedPatient, setSelectedPatient] = useState(null);
+
+    return (
+        <div style={{ height: "100vh", background: "#f8f9fa" }}>
+            {!selectedPatient ? (
+                // Show Table First
+                <PatientTable onRowClick={(patient) => setSelectedPatient(patient)} />
+            ) : (
+                // Show Tabs + Timeline when patient is selected
+                <TabsPanel patient={selectedPatient} />
+            )}
+        </div>
+    );
 }
 
 export default App;

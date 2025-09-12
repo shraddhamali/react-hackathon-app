@@ -1,0 +1,13 @@
+.vertical-timeline::before {
+    left: 18px !important;
+    width: 3px;
+    background: #ccc;
+}
+
+.vertical-timeline-element-icon {
+    box-shadow: none !important;
+}
+
+.vertical-timeline-element {
+    margin: 30px 0 !important; /* spacing between cards */
+}
