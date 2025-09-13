@@ -1,12 +1,7 @@
 // components/MedicalTimeline.js
 
 import React from "react";
-import {motion} from "framer-motion";
-import {
-    VerticalTimeline,
-    VerticalTimelineElement,
-} from "react-vertical-timeline-component";
-import "react-vertical-timeline-component/style.min.css";
+import { motion } from "framer-motion";
 import {
     FaHeartbeat,
     FaUserMd,
@@ -114,13 +109,13 @@ const data = [
 
 // Map categories to icons
 const categoryIcons = {
-    procedure: <FaUserMd/>,
-    imaging: <FaXRay/>,
-    immunization: <FaSyringe/>,
-    lab: <FaVials/>,
-    encounter: <FaHeartbeat/>,
-    note: <FaNotesMedical/>,
-    medication: <FaPills/>,
+    procedure: <FaUserMd />,
+    imaging: <FaXRay />,
+    immunization: <FaSyringe />,
+    lab: <FaVials />,
+    encounter: <FaHeartbeat />,
+    note: <FaNotesMedical />,
+    medication: <FaPills />,
 };
 
 // Map categories to colors
@@ -135,47 +130,39 @@ const categoryColors = {
 };
 
 const timelineVariants = {
-    hidden: {opacity: 0, x: 50},
-    visible: {opacity: 1, x: 0, transition: {duration: 0.6, ease: "easeOut"}},
+    hidden: { opacity: 0, x: 50 },
+    visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
 export default function MedicalTimeline() {
     return (
         <Box
             sx={{
-                position: "fixed",
-                top: 16,
-                right: 16,
-                width: 400,
-                height: 600,
+                width: "100%",
+                height: "100%",
                 bgcolor: "background.paper",
                 borderRadius: 2,
                 boxShadow: 3,
                 display: "flex",
                 flexDirection: "column",
-                zIndex: 1000,
             }}
         >
-            {/* Sticky Header */}
-            <Box
-                sx={{
-                    position: "sticky",
-                    top: 0,
-                    bgcolor: "background.paper",
-                    borderBottom: 1,
-                    borderColor: "divider",
-                    p: 1,
-                    textAlign: "center",
-                    fontWeight: "bold",
-                    zIndex: 10,
-                }}
-            >
-                Medical Timeline
-            </Box>
 
             {/* Scrollable Content */}
-            <Box sx={{flex: 1, overflowY: "auto", p: 1}}>
-                <VerticalTimeline layout="1-column-left">
+            <Box sx={{ flex: 1, overflowY: "auto", overflowX: "hidden", p: 1 }}>
+                <Box sx={{ position: "relative" }}>
+                    {/* Timeline Line */}
+                    <Box
+                        sx={{
+                            position: "absolute",
+                            left: 15,
+                            top: 0,
+                            bottom: 0,
+                            width: 2,
+                            backgroundColor: "#e0e0e0",
+                        }}
+                    />
+
                     {data.map((item, index) => {
                         const color = categoryColors[item.category] || "#007bff";
                         return (
@@ -183,40 +170,81 @@ export default function MedicalTimeline() {
                                 key={index}
                                 initial="hidden"
                                 whileInView="visible"
-                                viewport={{once: true, amount: 0.3}}
+                                viewport={{ once: true, amount: 0.3 }}
                                 variants={timelineVariants}
                             >
-                                <VerticalTimelineElement
-                                    date={item.date}
-                                    contentStyle={{
-                                        background: color,
-                                        color: "#fff",
-                                        padding: "6px 10px",
-                                        fontSize: "12px",
-                                        minHeight: "80px",
+                                <Box
+                                    sx={{
+                                        position: "relative",
+                                        display: "flex",
+                                        alignItems: "flex-start",
+                                        mb: 1.5,
+                                        pl: 4,
+                                        pr: 1,
                                     }}
-                                    contentArrowStyle={{
-                                        borderRight: `5px solid ${color}`,
-                                    }}
-                                    iconStyle={{
-                                        background: "#fff",
-                                        border: `3px solid ${color}`,
-                                        color: color,
-                                        boxShadow: "none",
-                                    }}
-                                    icon={categoryIcons[item.category] || <FaUserMd/>}
                                 >
-                                    <Box sx={{m: 0, fontSize: "14px", fontWeight: "600"}}>
-                                        {item.title}
+                                    {/* Timeline Icon */}
+                                    <Box
+                                        sx={{
+                                            position: "absolute",
+                                            left: 8,
+                                            top: 6,
+                                            width: 14,
+                                            height: 14,
+                                            borderRadius: "50%",
+                                            backgroundColor: "#fff",
+                                            border: `2px solid ${color}`,
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            zIndex: 2,
+                                        }}
+                                    >
+                                        <Box sx={{ color: color, fontSize: "6px" }}>
+                                            {categoryIcons[item.category] || <FaUserMd />}
+                                        </Box>
                                     </Box>
-                                    <Box sx={{mt: 0.5, fontSize: "12px"}}>
-                                        {item.details}
+
+                                    {/* Content Card */}
+                                    <Box
+                                        sx={{
+                                            backgroundColor: color,
+                                            color: "#fff",
+                                            padding: "4px 8px",
+                                            borderRadius: 1.5,
+                                            minHeight: "35px",
+                                            width: "100%",
+                                            position: "relative",
+                                            wordWrap: "break-word",
+                                            overflow: "hidden",
+                                            "&::before": {
+                                                content: '""',
+                                                position: "absolute",
+                                                left: -4,
+                                                top: 8,
+                                                width: 0,
+                                                height: 0,
+                                                borderTop: "4px solid transparent",
+                                                borderBottom: "4px solid transparent",
+                                                borderRight: `4px solid ${color}`,
+                                            },
+                                        }}
+                                    >
+                                        <Box sx={{ fontSize: "10px", fontWeight: "600", mb: 0.2, lineHeight: 1.1 }}>
+                                            {item.title.length > 25 ? item.title.substring(0, 25) + "..." : item.title}
+                                        </Box>
+                                        <Box sx={{ fontSize: "8px", opacity: 0.9, lineHeight: 1.1, mb: 0.2 }}>
+                                            {item.details.length > 40 ? item.details.substring(0, 40) + "..." : item.details}
+                                        </Box>
+                                        <Box sx={{ fontSize: "7px", opacity: 0.8 }}>
+                                            {item.date}
+                                        </Box>
                                     </Box>
-                                </VerticalTimelineElement>
+                                </Box>
                             </motion.div>
                         );
                     })}
-                </VerticalTimeline>
+                </Box>
             </Box>
         </Box>
 
