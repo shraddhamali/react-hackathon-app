@@ -49,146 +49,31 @@ function PatientGraph({ patient }) {
     const response = useMemo(() => {
         if (!patient) return { graphs: [] };
 
-        // Generate sample data based on patient age and demographics
-        const baseWeight = patient.sex === 'M' ? 180 : 150;
+       /* // Generate sample data based on patient age and demographics
+        const baseWeight = patient.sex === "M" ? 180 : 150;
         const ageFactor = patient.age / 50;
-        const baseWeightAdjusted = baseWeight + (ageFactor * 20);
+        const baseWeightAdjusted = baseWeight + ageFactor * 20;
 
-        const baseBP = patient.age > 60 ? { systolic: 140, diastolic: 85 } : { systolic: 120, diastolic: 80 };
+        const baseBP =
+            patient.age > 60
+                ? { systolic: 140, diastolic: 85 }
+                : { systolic: 120, diastolic: 80 };*/
 
-        return {
-            graphs: [
-                {
-                    graph_name: 'Weight by Encounter (lb)',
-                    graph_type: 'line',
-                    summary_of_day: 'Weight tracking over time with seasonal variations.',
-                    graph_data: [
-                        { date: '2023-03-14', encounter: 'Cardiology Office Visit', weight_lb: baseWeightAdjusted },
-                        { date: '2023-03-24', encounter: 'Family Medicine Office Visit', weight_lb: baseWeightAdjusted - 2 },
-                        { date: '2023-04-18', encounter: 'Family Medicine Office Visit', weight_lb: baseWeightAdjusted - 5 },
-                        { date: '2023-04-25', encounter: 'Family Medicine Office Visit', weight_lb: baseWeightAdjusted - 8 },
-                        { date: '2023-10-23', encounter: 'Family Medicine Office Visit', weight_lb: baseWeightAdjusted + 4 },
-                        { date: '2023-11-15', encounter: 'General Surgery Office Visit', weight_lb: baseWeightAdjusted + 2 }
-                    ]
-                },
-                {
-                    graph_name: 'BMI by Encounter',
-                    graph_type: 'line',
-                    summary_of_day: 'BMI tracking with healthy range indicators.',
-                    graph_data: [
-                        { date: '2023-03-14', encounter: 'Cardiology Office Visit', bmi: 28.5 },
-                        { date: '2023-03-24', encounter: 'Family Medicine Office Visit', bmi: 28.2 },
-                        { date: '2023-04-18', encounter: 'Family Medicine Office Visit', bmi: 27.8 },
-                        { date: '2023-04-25', encounter: 'Family Medicine Office Visit', bmi: 27.2 },
-                        { date: '2023-10-23', encounter: 'Family Medicine Office Visit', bmi: 29.1 },
-                        { date: '2023-11-15', encounter: 'General Surgery Office Visit', bmi: 28.8 }
-                    ]
-                },
-                {
-                    graph_name: 'Blood Pressure by Encounter (mmHg)',
-                    graph_type: 'multi-line',
-                    summary_of_day: 'Blood pressure monitoring with hypertension guidelines.',
-                    graph_data: [
-                        { date: '2023-03-14', encounter: 'Cardiology Office Visit', systolic: baseBP.systolic + 18, diastolic: baseBP.diastolic + 8 },
-                        { date: '2023-03-24', encounter: 'Family Medicine Office Visit', systolic: baseBP.systolic + 10, diastolic: baseBP.diastolic - 2 },
-                        { date: '2023-04-18', encounter: 'Family Medicine Office Visit', systolic: baseBP.systolic + 18, diastolic: baseBP.diastolic + 6 },
-                        { date: '2023-04-25', encounter: 'Family Medicine Office Visit', systolic: baseBP.systolic + 22, diastolic: baseBP.diastolic + 10 },
-                        { date: '2023-10-23', encounter: 'Family Medicine Office Visit', systolic: baseBP.systolic + 26, diastolic: baseBP.diastolic + 8 },
-                        { date: '2023-11-15', encounter: 'General Surgery Office Visit', systolic: baseBP.systolic + 16, diastolic: baseBP.diastolic + 4 }
-                    ]
-                },
-                {
-                    graph_name: 'Heart Rate by Encounter (bpm)',
-                    graph_type: 'line',
-                    summary_of_day: 'Heart rate monitoring over time.',
-                    graph_data: [
-                        { date: '2023-03-14', encounter: 'Cardiology Office Visit', heart_rate_bpm: 75 },
-                        { date: '2023-04-25', encounter: 'Family Medicine Office Visit', heart_rate_bpm: 78 },
-                        { date: '2023-10-23', encounter: 'Family Medicine Office Visit', heart_rate_bpm: 68 }
-                    ]
-                },
-                {
-                    graph_name: 'Oxygen Saturation by Encounter (%)',
-                    graph_type: 'line',
-                    summary_of_day: 'Oxygen saturation remained stable across encounters.',
-                    graph_data: [
-                        { date: '2023-03-14', encounter: 'Cardiology Office Visit', spo2_percent: 97 },
-                        { date: '2023-04-25', encounter: 'Family Medicine Office Visit', spo2_percent: 98 },
-                        { date: '2023-10-23', encounter: 'Family Medicine Office Visit', spo2_percent: 97 }
-                    ]
-                },
-                {
-                    graph_name: 'Blood Pressure Category by Encounter',
-                    graph_type: 'bar',
-                    summary_of_day: 'Blood pressure classification over time.',
-                    graph_data: [
-                        { date: '2023-03-14', encounter: 'Cardiology Office Visit', category: 'Stage 1' },
-                        { date: '2023-03-24', encounter: 'Family Medicine Office Visit', category: 'Stage 1' },
-                        { date: '2023-04-18', encounter: 'Family Medicine Office Visit', category: 'Stage 1' },
-                        { date: '2023-04-25', encounter: 'Family Medicine Office Visit', category: 'Stage 2' },
-                        { date: '2023-10-23', encounter: 'Family Medicine Office Visit', category: 'Stage 2' },
-                        { date: '2023-11-15', encounter: 'General Surgery Office Visit', category: 'Stage 1' }
-                    ]
-                },
-                {
-                    graph_name: 'Lab Values Trend (mg/dL)',
-                    graph_type: 'multi-line',
-                    summary_of_day: 'Key lab values showing glucose, cholesterol, and creatinine trends.',
-                    graph_data: [
-                        { date: '2023-03-14', encounter: 'Cardiology Office Visit', glucose: 95, cholesterol: 180, creatinine: 0.9 },
-                        { date: '2023-04-25', encounter: 'Family Medicine Office Visit', glucose: 102, cholesterol: 195, creatinine: 0.95 },
-                        { date: '2023-10-23', encounter: 'Family Medicine Office Visit', glucose: 108, cholesterol: 210, creatinine: 1.0 },
-                        { date: '2023-11-15', encounter: 'General Surgery Office Visit', glucose: 98, cholesterol: 185, creatinine: 0.92 }
-                    ]
-                },
-                {
-                    graph_name: 'Medication Adherence (%)',
-                    graph_type: 'bar',
-                    summary_of_day: 'Medication adherence rates by month showing compliance trends.',
-                    graph_data: [
-                        { date: '2023-03', adherence: 85 },
-                        { date: '2023-04', adherence: 92 },
-                        { date: '2023-05', adherence: 78 },
-                        { date: '2023-06', adherence: 88 },
-                        { date: '2023-07', adherence: 95 },
-                        { date: '2023-08', adherence: 90 },
-                        { date: '2023-09', adherence: 87 },
-                        { date: '2023-10', adherence: 93 },
-                        { date: '2023-11', adherence: 89 }
-                    ]
-                },
-                {
-                    graph_name: 'Symptom Severity Heatmap',
-                    graph_type: 'heatmap',
-                    summary_of_day: 'Symptom severity tracking across different conditions.',
-                    graph_data: [
-                        { symptom: 'Fatigue', severity: 3, date: '2023-03-14' },
-                        { symptom: 'Headache', severity: 2, date: '2023-03-14' },
-                        { symptom: 'Chest Pain', severity: 1, date: '2023-03-14' },
-                        { symptom: 'Fatigue', severity: 4, date: '2023-04-25' },
-                        { symptom: 'Headache', severity: 3, date: '2023-04-25' },
-                        { symptom: 'Chest Pain', severity: 2, date: '2023-04-25' },
-                        { symptom: 'Fatigue', severity: 2, date: '2023-10-23' },
-                        { symptom: 'Headache', severity: 1, date: '2023-10-23' },
-                        { symptom: 'Chest Pain', severity: 1, date: '2023-10-23' }
-                    ]
-                },
-                {
-                    graph_name: 'Risk Score Progression',
-                    graph_type: 'line',
-                    summary_of_day: 'Cardiovascular risk score changes over time.',
-                    graph_data: [
-                        { date: '2023-03-14', risk_score: 15.2 },
-                        { date: '2023-04-25', risk_score: 14.8 },
-                        { date: '2023-06-15', risk_score: 13.5 },
-                        { date: '2023-08-20', risk_score: 12.9 },
-                        { date: '2023-10-23', risk_score: 11.2 },
-                        { date: '2023-11-15', risk_score: 10.8 }
-                    ]
-                }
-            ]
-        };
+        // 🔹 Get from localStorage instead of static graphs
+        const storedData = localStorage.getItem("patientData");
+        if (storedData) {
+            const patients = JSON.parse(storedData)?.patients || [];
+            const patientDetail = patients.find((p) => p._id === patient?._id);
+
+            if (patientDetail?.ai_response?.graphs) {
+                return { graphs: patientDetail.ai_response.graphs };
+            }
+        }
+
+        // fallback if no localStorage data
+        return { graphs: [] };
     }, [patient]);
+
 
     const toDate = (d) => new Date(d).getTime();
 
@@ -721,6 +606,7 @@ function PatientGraph({ patient }) {
         const bp = response.graphs.find(g => g.graph_name.includes('Blood Pressure by Encounter'))?.graph_data.map(d => ({ date: d.date, value: d.systolic })) || [];
         const hr = response.graphs.find(g => g.graph_name.includes('Heart Rate'))?.graph_data.map(d => ({ date: d.date, value: d.heart_rate_bpm })) || [];
 
+        console.log('KPI Data Debug:', { weight, bmi, bp, hr });
         return { weight, bmi, bp, hr };
     })();
 
@@ -735,7 +621,9 @@ function PatientGraph({ patient }) {
     }
 
     // Debug: Log the data to console
-
+    console.log('PatientGraph - Patient:', patient);
+    console.log('PatientGraph - Response:', response);
+    console.log('PatientGraph - KPI Data:', kpiData);
 
     return (
         <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
