@@ -155,7 +155,7 @@ export default function MedicalTimeline() {
                     <Box
                         sx={{
                             position: "absolute",
-                            left: 15,
+                            left: 16,
                             top: 0,
                             bottom: 0,
                             width: 2,
@@ -178,8 +178,8 @@ export default function MedicalTimeline() {
                                         position: "relative",
                                         display: "flex",
                                         alignItems: "flex-start",
-                                        mb: 1.5,
-                                        pl: 4,
+                                        mb: 2,
+                                        pl: 5,
                                         pr: 1,
                                     }}
                                 >
@@ -187,10 +187,10 @@ export default function MedicalTimeline() {
                                     <Box
                                         sx={{
                                             position: "absolute",
-                                            left: 8,
-                                            top: 6,
-                                            width: 14,
-                                            height: 14,
+                                            left: 6,
+                                            top: 4,
+                                            width: 20,
+                                            height: 20,
                                             borderRadius: "50%",
                                             backgroundColor: "#fff",
                                             border: `2px solid ${color}`,
@@ -200,7 +200,7 @@ export default function MedicalTimeline() {
                                             zIndex: 2,
                                         }}
                                     >
-                                        <Box sx={{ color: color, fontSize: "6px" }}>
+                                        <Box sx={{ color: color, fontSize: "12px" }}>
                                             {categoryIcons[item.category] || <FaUserMd />}
                                         </Box>
                                     </Box>
@@ -210,9 +210,9 @@ export default function MedicalTimeline() {
                                         sx={{
                                             backgroundColor: color,
                                             color: "#fff",
-                                            padding: "4px 8px",
+                                            padding: "6px 10px",
                                             borderRadius: 1.5,
-                                            minHeight: "35px",
+                                            minHeight: "50px",
                                             width: "100%",
                                             position: "relative",
                                             wordWrap: "break-word",
@@ -221,7 +221,7 @@ export default function MedicalTimeline() {
                                                 content: '""',
                                                 position: "absolute",
                                                 left: -4,
-                                                top: 8,
+                                                top: 10,
                                                 width: 0,
                                                 height: 0,
                                                 borderTop: "4px solid transparent",
@@ -230,13 +230,13 @@ export default function MedicalTimeline() {
                                             },
                                         }}
                                     >
-                                        <Box sx={{ fontSize: "10px", fontWeight: "600", mb: 0.2, lineHeight: 1.1 }}>
-                                            {item.title.length > 25 ? item.title.substring(0, 25) + "..." : item.title}
+                                        <Box sx={{ fontSize: "14px", fontWeight: "600", mb: 0.4, lineHeight: 1.3 }}>
+                                            {item.title.length > 30 ? item.title.substring(0, 30) + "..." : item.title}
                                         </Box>
-                                        <Box sx={{ fontSize: "8px", opacity: 0.9, lineHeight: 1.1, mb: 0.2 }}>
-                                            {item.details.length > 40 ? item.details.substring(0, 40) + "..." : item.details}
+                                        <Box sx={{ fontSize: "12px", opacity: 0.9, lineHeight: 1.3, mb: 0.4 }}>
+                                            {item.details.length > 50 ? item.details.substring(0, 50) + "..." : item.details}
                                         </Box>
-                                        <Box sx={{ fontSize: "7px", opacity: 0.8 }}>
+                                        <Box sx={{ fontSize: "11px", opacity: 0.8 }}>
                                             {item.date}
                                         </Box>
                                     </Box>

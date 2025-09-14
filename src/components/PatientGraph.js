@@ -740,26 +740,10 @@ function PatientGraph({ patient }) {
     console.log('PatientGraph - Response:', response);
     console.log('PatientGraph - KPI Data:', kpiData);
 
-    // Test if ECharts is working
-    const testOption = {
-        title: { text: 'Test Chart', left: 'center' },
-        xAxis: { type: 'category', data: ['A', 'B', 'C'] },
-        yAxis: { type: 'value' },
-        series: [{ type: 'line', data: [1, 2, 3], lineStyle: { color: '#1976d2' } }]
-    };
-
     return (
         <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
             {/* Scrollable Content */}
             <Box sx={{ flex: 1, overflow: "auto", p: 1 }}>
-                {/* Test Chart */}
-                <Box sx={{ mb: 2, p: 2, border: '1px solid #ccc', borderRadius: 1 }}>
-                    <Typography variant="h6" sx={{ mb: 1 }}>Test Chart (Should show a simple line chart):</Typography>
-                    <ReactECharts
-                        option={testOption}
-                        style={{ height: 200, width: '100%' }}
-                    />
-                </Box>
 
                 {/* KPI header with sparklines - 4 boxes, 25% each */}
                 <Box sx={{ display: 'flex', width: '100%', gap: 1, mb: 3 }}>
