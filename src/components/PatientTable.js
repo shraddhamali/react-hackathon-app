@@ -120,7 +120,7 @@ export default function PatientTable({ onRowClick }) {
                     variant="h6"
                     sx={{ p: 2, fontWeight: "bold", borderBottom: "1px solid #ddd", backgroundColor: "#f1f3f6" }}
                 >
-                    Patient Demographics
+                    Patient Details
                 </Typography>
 
                 <Table>

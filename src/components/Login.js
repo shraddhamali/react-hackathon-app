@@ -9,7 +9,7 @@ import {
     Alert,
     Container
 } from '@mui/material';
-import { LocalHospital, HealthAndSafety, MedicalServices } from '@mui/icons-material';
+import { HealthAndSafety, MedicalServices } from '@mui/icons-material';
 
 function Login() {
     const navigate = useNavigate();
@@ -250,36 +250,18 @@ function Login() {
                             sx={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                justifyContent: 'center',
-                                mb: 2
+                                justifyContent: 'center'
                             }}
                         >
-                            <Box
-                                sx={{
-                                    width: 50,
-                                    height: 50,
-                                    background: 'linear-gradient(135deg, #1976d2, #4caf50)',
-                                    borderRadius: 2,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    mr: 2,
-                                    boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+                            <img
+                                src="/logoWithName.png"
+                                alt="MedCare Logo"
+                                style={{
+                                    height: '150px',
+                                    maxWidth: '100%',
+                                    objectFit: 'contain'
                                 }}
-                            >
-                                <LocalHospital sx={{ fontSize: 28, color: 'white' }} />
-                            </Box>
-                            <Typography
-                                variant="h4"
-                                component="h1"
-                                sx={{
-                                    fontWeight: 'bold',
-                                    color: '#1976d2',
-                                    fontSize: '2rem'
-                                }}
-                            >
-                                MedCare
-                            </Typography>
+                            />
                         </Box>
 
                         <Typography
@@ -291,15 +273,6 @@ function Login() {
                             }}
                         >
                             Welcome Back
-                        </Typography>
-                        <Typography
-                            variant="body1"
-                            sx={{
-                                color: '#666',
-                                fontSize: '0.95rem'
-                            }}
-                        >
-                            Please enter your credentials to access the medical dashboard
                         </Typography>
                     </Box>
 
