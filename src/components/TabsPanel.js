@@ -590,7 +590,8 @@ export default function TabsPanel({patient, onBackToTable}) {
                 )}
             </Box>
             <Box sx={{ display: "flex", height: "100vh", background: "#f8f9fa" }}>
-                <Chatbot />
+                <Chatbot
+                    patientId={patient._id}/>
             </Box>
         </Box>
     );
