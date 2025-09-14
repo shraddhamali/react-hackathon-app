@@ -4,6 +4,7 @@ import {useNavigate} from "react-router-dom";
 import {Logout} from "@mui/icons-material";
 import MedicalTimeline from "./MedicalTimeline";
 import PatientGraph from "./PatientGraph";
+import Chatbot from "./chatbot";
 
 export default function TabsPanel({patient, onBackToTable}) {
     const [tabValue, setTabValue] = React.useState("summary");
@@ -587,6 +588,9 @@ export default function TabsPanel({patient, onBackToTable}) {
                         </Box>
                     </Box>
                 )}
+            </Box>
+            <Box sx={{ display: "flex", height: "100vh", background: "#f8f9fa" }}>
+                <Chatbot />
             </Box>
         </Box>
     );
