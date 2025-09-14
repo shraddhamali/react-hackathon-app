@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
-import { Box, Typography, Paper } from '@mui/material';
+import { Box, Typography, Paper, Grid } from '@mui/material';
 
-// Register a cool color theme
+// Register a cool color theme (blues/teals/purples) - slightly darker blues
 const COOL_THEME = {
     color: ['#0097a7', '#1e88e5', '#7c4dff', '#2a9d8f', '#8e24aa', '#00e5ff', '#42a5f5', '#5c9cff'],
     backgroundColor: '#ffffff',
@@ -13,11 +13,30 @@ const COOL_THEME = {
     legend: { textStyle: { color: '#37474f' } },
     axisPointer: { lineStyle: { color: '#80deea' }, crossStyle: { color: '#80deea' } },
     grid: { containLabel: true },
-    categoryAxis: { axisLine: { lineStyle: { color: '#90a4ae' } }, axisTick: { lineStyle: { color: '#90a4ae' } }, axisLabel: { color: '#455a64' }, splitLine: { show: false } },
-    valueAxis: { axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#455a64' }, splitLine: { lineStyle: { color: '#eceff1' } } },
+    categoryAxis: {
+        axisLine: { lineStyle: { color: '#90a4ae' } },
+        axisTick: { lineStyle: { color: '#90a4ae' } },
+        axisLabel: { color: '#455a64' },
+        splitLine: { show: false }
+    },
+    valueAxis: {
+        axisLine: { show: false },
+        axisTick: { show: false },
+        axisLabel: { color: '#455a64' },
+        splitLine: { lineStyle: { color: '#eceff1' } }
+    },
     dataZoom: [
-        { fillerColor: 'rgba(0, 151, 167, 0.18)', handleStyle: { color: '#0097a7', borderColor: '#0097a7' }, moveHandleStyle: { color: '#0097a7' }, textStyle: { color: '#546e7a' } },
-        { handleStyle: { color: '#5e35b1', borderColor: '#5e35b1' }, moveHandleStyle: { color: '#5e35b1' }, textStyle: { color: '#546e7a' } }
+        {
+            fillerColor: 'rgba(0, 151, 167, 0.18)',
+            handleStyle: { color: '#0097a7', borderColor: '#0097a7' },
+            moveHandleStyle: { color: '#0097a7' },
+            textStyle: { color: '#546e7a' }
+        },
+        {
+            handleStyle: { color: '#5e35b1', borderColor: '#5e35b1' },
+            moveHandleStyle: { color: '#5e35b1' },
+            textStyle: { color: '#546e7a' }
+        }
     ],
     line: { smooth: true, symbolSize: 6 },
     bar: { itemStyle: { borderRadius: [4, 4, 0, 0] } },
@@ -26,27 +45,173 @@ const COOL_THEME = {
 echarts.registerTheme('cool-med', COOL_THEME);
 
 function PatientGraph({ patient }) {
-    const [graphResponse, setGraph] = useState([]);
+    // Generate comprehensive medical data with multiple visualization types
+    const response = useMemo(() => {
+        if (!patient) return { graphs: [] };
 
-    useEffect(() => {
-        const storedData = localStorage.getItem("patientData");
-        if (storedData) {
-            const patients = JSON.parse(storedData)?.patients || [];
-            const patientDetail = patients.find((p) => p._id === patient?._id);
-            if (patientDetail?.ai_response?.graphs) {
-                setGraph(patientDetail.ai_response.graphs);
-            }
-        }
+        // Generate sample data based on patient age and demographics
+        const baseWeight = patient.sex === 'M' ? 180 : 150;
+        const ageFactor = patient.age / 50;
+        const baseWeightAdjusted = baseWeight + (ageFactor * 20);
+
+        const baseBP = patient.age > 60 ? { systolic: 140, diastolic: 85 } : { systolic: 120, diastolic: 80 };
+
+        return {
+            graphs: [
+                {
+                    graph_name: 'Weight by Encounter (lb)',
+                    graph_type: 'line',
+                    summary_of_day: 'Weight tracking over time with seasonal variations.',
+                    graph_data: [
+                        { date: '2023-03-14', encounter: 'Cardiology Office Visit', weight_lb: baseWeightAdjusted },
+                        { date: '2023-03-24', encounter: 'Family Medicine Office Visit', weight_lb: baseWeightAdjusted - 2 },
+                        { date: '2023-04-18', encounter: 'Family Medicine Office Visit', weight_lb: baseWeightAdjusted - 5 },
+                        { date: '2023-04-25', encounter: 'Family Medicine Office Visit', weight_lb: baseWeightAdjusted - 8 },
+                        { date: '2023-10-23', encounter: 'Family Medicine Office Visit', weight_lb: baseWeightAdjusted + 4 },
+                        { date: '2023-11-15', encounter: 'General Surgery Office Visit', weight_lb: baseWeightAdjusted + 2 }
+                    ]
+                },
+                {
+                    graph_name: 'BMI by Encounter',
+                    graph_type: 'line',
+                    summary_of_day: 'BMI tracking with healthy range indicators.',
+                    graph_data: [
+                        { date: '2023-03-14', encounter: 'Cardiology Office Visit', bmi: 28.5 },
+                        { date: '2023-03-24', encounter: 'Family Medicine Office Visit', bmi: 28.2 },
+                        { date: '2023-04-18', encounter: 'Family Medicine Office Visit', bmi: 27.8 },
+                        { date: '2023-04-25', encounter: 'Family Medicine Office Visit', bmi: 27.2 },
+                        { date: '2023-10-23', encounter: 'Family Medicine Office Visit', bmi: 29.1 },
+                        { date: '2023-11-15', encounter: 'General Surgery Office Visit', bmi: 28.8 }
+                    ]
+                },
+                {
+                    graph_name: 'Blood Pressure by Encounter (mmHg)',
+                    graph_type: 'multi-line',
+                    summary_of_day: 'Blood pressure monitoring with hypertension guidelines.',
+                    graph_data: [
+                        { date: '2023-03-14', encounter: 'Cardiology Office Visit', systolic: baseBP.systolic + 18, diastolic: baseBP.diastolic + 8 },
+                        { date: '2023-03-24', encounter: 'Family Medicine Office Visit', systolic: baseBP.systolic + 10, diastolic: baseBP.diastolic - 2 },
+                        { date: '2023-04-18', encounter: 'Family Medicine Office Visit', systolic: baseBP.systolic + 18, diastolic: baseBP.diastolic + 6 },
+                        { date: '2023-04-25', encounter: 'Family Medicine Office Visit', systolic: baseBP.systolic + 22, diastolic: baseBP.diastolic + 10 },
+                        { date: '2023-10-23', encounter: 'Family Medicine Office Visit', systolic: baseBP.systolic + 26, diastolic: baseBP.diastolic + 8 },
+                        { date: '2023-11-15', encounter: 'General Surgery Office Visit', systolic: baseBP.systolic + 16, diastolic: baseBP.diastolic + 4 }
+                    ]
+                },
+                {
+                    graph_name: 'Heart Rate by Encounter (bpm)',
+                    graph_type: 'line',
+                    summary_of_day: 'Heart rate monitoring over time.',
+                    graph_data: [
+                        { date: '2023-03-14', encounter: 'Cardiology Office Visit', heart_rate_bpm: 75 },
+                        { date: '2023-04-25', encounter: 'Family Medicine Office Visit', heart_rate_bpm: 78 },
+                        { date: '2023-10-23', encounter: 'Family Medicine Office Visit', heart_rate_bpm: 68 }
+                    ]
+                },
+                {
+                    graph_name: 'Oxygen Saturation by Encounter (%)',
+                    graph_type: 'line',
+                    summary_of_day: 'Oxygen saturation remained stable across encounters.',
+                    graph_data: [
+                        { date: '2023-03-14', encounter: 'Cardiology Office Visit', spo2_percent: 97 },
+                        { date: '2023-04-25', encounter: 'Family Medicine Office Visit', spo2_percent: 98 },
+                        { date: '2023-10-23', encounter: 'Family Medicine Office Visit', spo2_percent: 97 }
+                    ]
+                },
+                {
+                    graph_name: 'Blood Pressure Category by Encounter',
+                    graph_type: 'bar',
+                    summary_of_day: 'Blood pressure classification over time.',
+                    graph_data: [
+                        { date: '2023-03-14', encounter: 'Cardiology Office Visit', category: 'Stage 1' },
+                        { date: '2023-03-24', encounter: 'Family Medicine Office Visit', category: 'Stage 1' },
+                        { date: '2023-04-18', encounter: 'Family Medicine Office Visit', category: 'Stage 1' },
+                        { date: '2023-04-25', encounter: 'Family Medicine Office Visit', category: 'Stage 2' },
+                        { date: '2023-10-23', encounter: 'Family Medicine Office Visit', category: 'Stage 2' },
+                        { date: '2023-11-15', encounter: 'General Surgery Office Visit', category: 'Stage 1' }
+                    ]
+                },
+                {
+                    graph_name: 'Lab Values Trend (mg/dL)',
+                    graph_type: 'multi-line',
+                    summary_of_day: 'Key lab values showing glucose, cholesterol, and creatinine trends.',
+                    graph_data: [
+                        { date: '2023-03-14', encounter: 'Cardiology Office Visit', glucose: 95, cholesterol: 180, creatinine: 0.9 },
+                        { date: '2023-04-25', encounter: 'Family Medicine Office Visit', glucose: 102, cholesterol: 195, creatinine: 0.95 },
+                        { date: '2023-10-23', encounter: 'Family Medicine Office Visit', glucose: 108, cholesterol: 210, creatinine: 1.0 },
+                        { date: '2023-11-15', encounter: 'General Surgery Office Visit', glucose: 98, cholesterol: 185, creatinine: 0.92 }
+                    ]
+                },
+                {
+                    graph_name: 'Medication Adherence (%)',
+                    graph_type: 'bar',
+                    summary_of_day: 'Medication adherence rates by month showing compliance trends.',
+                    graph_data: [
+                        { date: '2023-03', adherence: 85 },
+                        { date: '2023-04', adherence: 92 },
+                        { date: '2023-05', adherence: 78 },
+                        { date: '2023-06', adherence: 88 },
+                        { date: '2023-07', adherence: 95 },
+                        { date: '2023-08', adherence: 90 },
+                        { date: '2023-09', adherence: 87 },
+                        { date: '2023-10', adherence: 93 },
+                        { date: '2023-11', adherence: 89 }
+                    ]
+                },
+                {
+                    graph_name: 'Symptom Severity Heatmap',
+                    graph_type: 'heatmap',
+                    summary_of_day: 'Symptom severity tracking across different conditions.',
+                    graph_data: [
+                        { symptom: 'Fatigue', severity: 3, date: '2023-03-14' },
+                        { symptom: 'Headache', severity: 2, date: '2023-03-14' },
+                        { symptom: 'Chest Pain', severity: 1, date: '2023-03-14' },
+                        { symptom: 'Fatigue', severity: 4, date: '2023-04-25' },
+                        { symptom: 'Headache', severity: 3, date: '2023-04-25' },
+                        { symptom: 'Chest Pain', severity: 2, date: '2023-04-25' },
+                        { symptom: 'Fatigue', severity: 2, date: '2023-10-23' },
+                        { symptom: 'Headache', severity: 1, date: '2023-10-23' },
+                        { symptom: 'Chest Pain', severity: 1, date: '2023-10-23' }
+                    ]
+                },
+                {
+                    graph_name: 'Risk Score Progression',
+                    graph_type: 'line',
+                    summary_of_day: 'Cardiovascular risk score changes over time.',
+                    graph_data: [
+                        { date: '2023-03-14', risk_score: 15.2 },
+                        { date: '2023-04-25', risk_score: 14.8 },
+                        { date: '2023-06-15', risk_score: 13.5 },
+                        { date: '2023-08-20', risk_score: 12.9 },
+                        { date: '2023-10-23', risk_score: 11.2 },
+                        { date: '2023-11-15', risk_score: 10.8 }
+                    ]
+                }
+            ]
+        };
     }, [patient]);
 
     const toDate = (d) => new Date(d).getTime();
-    const categoryToValue = (c) => ({ Normal: 0, Elevated: 0.5, 'Stage 1': 1, 'Stage 2': 2, 'Hypertensive Crisis': 3 }[c] ?? 0);
-    const categoryValueToLabel = (v) => v >= 3 ? 'Crisis' : v >= 2 ? 'Stage 2' : v >= 1 ? 'Stage 1' : v > 0 ? 'Elevated' : 'Normal';
+
+    const categoryToValue = (c) => {
+        const map = { Normal: 0, Elevated: 0.5, 'Stage 1': 1, 'Stage 2': 2, 'Hypertensive Crisis': 3 };
+        return map[c] ?? 0;
+    };
+
+    const categoryValueToLabel = (v) => {
+        if (v >= 3) return 'Crisis';
+        if (v >= 2) return 'Stage 2';
+        if (v >= 1) return 'Stage 1';
+        if (v > 0) return 'Elevated';
+        return 'Normal';
+    };
 
     const commonTimeSeriesEnhancements = (xDates) => ({
         animationDuration: 600,
         animationEasing: 'cubicOut',
-        dataZoom: [{ type: 'inside', xAxisIndex: 0, minSpan: 10 }, { type: 'slider', xAxisIndex: 0 }],
+        dataZoom: [
+            { type: 'inside', xAxisIndex: 0, minSpan: 10 },
+            { type: 'slider', xAxisIndex: 0 }
+        ],
         axisPointer: { link: [{ xAxisIndex: 'all' }] },
         grid: { left: 48, right: 24, top: 48, bottom: 64 }
     });
@@ -60,37 +225,504 @@ function PatientGraph({ patient }) {
     };
 
     const buildOption = (graph) => {
-        if (!graph || !graph.graph_data) return { title: { text: 'No Data' } };
         const name = graph.graph_name;
-        const data = [...graph.graph_data].sort((a, b) => toDate(a.date) - toDate(b.date));
+        const data = [...graph.graph_data];
+        if (data.length && data[0].date) {
+            data.sort((a, b) => toDate(a.date) - toDate(b.date));
+        }
 
-        // Example: Weight chart
-        if (name.includes('Weight')) {
-            const x = data.map(d => d.date);
+        if (name.includes('Weight by Encounter')) {
+            const x = data.map((d) => d.date);
             const enh = commonTimeSeriesEnhancements(x);
             return {
-                title: { text: name, left: 'center', top: 10, textStyle: { fontSize: 14, fontWeight: 'bold' } },
+                title: {
+                    text: name,
+                    left: 'center',
+                    top: 10,
+                    textStyle: { fontSize: 14, fontWeight: 'bold' }
+                },
                 tooltip: { trigger: 'axis' },
-                xAxis: { type: 'category', data: x, axisLabel: { rotate: 45, fontSize: 10, interval: 0 } },
-                yAxis: { type: 'value', name: 'lb', nameLocation: 'middle', nameGap: 30, nameTextStyle: { fontSize: 12 } },
+                xAxis: {
+                    type: 'category',
+                    data: x,
+                    axisLabel: {
+                        rotate: 45,
+                        fontSize: 10,
+                        interval: 0
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'lb',
+                    nameLocation: 'middle',
+                    nameGap: 30,
+                    nameTextStyle: { fontSize: 12 }
+                },
                 dataZoom: enh.dataZoom,
-                grid: { left: 60, right: 30, top: 50, bottom: 80, containLabel: true },
+                grid: {
+                    left: 60,
+                    right: 30,
+                    top: 50,
+                    bottom: 80,
+                    containLabel: true
+                },
                 animationDuration: enh.animationDuration,
                 animationEasing: enh.animationEasing,
-                series: [{ name: 'Weight', type: 'line', data: data.map(d => d.weight_lb ?? 0), ...lineSeriesEnhancements }]
+                series: [{ name: 'Weight', type: 'line', data: data.map((d) => d.weight_lb), ...lineSeriesEnhancements }]
             };
         }
 
-        // fallback generic line chart
-        const x = data.map((d, i) => d.date || `Item ${i + 1}`);
-        const yData = data.map(d => Object.values(d).find(v => typeof v === 'number') ?? 0);
+        if (name.includes('BMI')) {
+            const x = data.map((d) => d.date);
+            const enh = commonTimeSeriesEnhancements(x);
+            return {
+                title: {
+                    text: name,
+                    left: 'center',
+                    top: 10,
+                    textStyle: { fontSize: 14, fontWeight: 'bold' }
+                },
+                tooltip: { trigger: 'axis' },
+                xAxis: {
+                    type: 'category',
+                    data: x,
+                    axisLabel: {
+                        rotate: 45,
+                        fontSize: 10,
+                        interval: 0
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    nameTextStyle: { fontSize: 12 }
+                },
+                dataZoom: enh.dataZoom,
+                grid: {
+                    left: 60,
+                    right: 30,
+                    top: 50,
+                    bottom: 80,
+                    containLabel: true
+                },
+                animationDuration: enh.animationDuration,
+                animationEasing: enh.animationEasing,
+                series: [{ name: 'BMI', type: 'line', data: data.map((d) => d.bmi), ...lineSeriesEnhancements }],
+                markLine: {
+                    silent: true,
+                    lineStyle: { color: '#7c4dff' },
+                    data: [
+                        { yAxis: 25, label: { formatter: 'Overweight 25', position: 'end' } },
+                        { yAxis: 30, label: { formatter: 'Obesity 30', position: 'end' } }
+                    ]
+                }
+            };
+        }
+
+        if (name.includes('Blood Pressure by Encounter')) {
+            const x = data.map((d) => d.date);
+            const enh = commonTimeSeriesEnhancements(x);
+            return {
+                title: {
+                    text: name,
+                    left: 'center',
+                    top: 10,
+                    textStyle: { fontSize: 14, fontWeight: 'bold' }
+                },
+                tooltip: { trigger: 'axis' },
+                legend: {
+                    data: ['Systolic', 'Diastolic'],
+                    top: 35,
+                    left: 'center',
+                    itemGap: 20
+                },
+                xAxis: {
+                    type: 'category',
+                    data: x,
+                    axisLabel: {
+                        rotate: 45,
+                        fontSize: 10,
+                        interval: 0
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'mmHg',
+                    nameLocation: 'middle',
+                    nameGap: 30,
+                    nameTextStyle: { fontSize: 12 }
+                },
+                dataZoom: enh.dataZoom,
+                grid: {
+                    left: 60,
+                    right: 30,
+                    top: 70,
+                    bottom: 80,
+                    containLabel: true
+                },
+                animationDuration: enh.animationDuration,
+                animationEasing: enh.animationEasing,
+                series: [
+                    { name: 'Systolic', type: 'line', data: data.map((d) => d.systolic), ...lineSeriesEnhancements },
+                    { name: 'Diastolic', type: 'line', data: data.map((d) => d.diastolic), ...lineSeriesEnhancements }
+                ],
+                markLine: {
+                    silent: true,
+                    lineStyle: { color: '#0097a7' },
+                    data: [
+                        { yAxis: 120, label: { formatter: 'SBP 120', position: 'end' } },
+                        { yAxis: 130, label: { formatter: 'SBP 130', position: 'end' } },
+                        { yAxis: 140, label: { formatter: 'SBP 140', position: 'end' } }
+                    ]
+                }
+            };
+        }
+
+        if (name.includes('Heart Rate')) {
+            const x = data.map((d) => d.date);
+            const enh = commonTimeSeriesEnhancements(x);
+            return {
+                title: {
+                    text: name,
+                    left: 'center',
+                    top: 10,
+                    textStyle: { fontSize: 14, fontWeight: 'bold' }
+                },
+                tooltip: { trigger: 'axis' },
+                xAxis: {
+                    type: 'category',
+                    data: x,
+                    axisLabel: {
+                        rotate: 45,
+                        fontSize: 10,
+                        interval: 0
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'bpm',
+                    nameLocation: 'middle',
+                    nameGap: 30,
+                    nameTextStyle: { fontSize: 12 }
+                },
+                dataZoom: enh.dataZoom,
+                grid: {
+                    left: 60,
+                    right: 30,
+                    top: 50,
+                    bottom: 80,
+                    containLabel: true
+                },
+                animationDuration: enh.animationDuration,
+                animationEasing: enh.animationEasing,
+                series: [{ name: 'HR', type: 'line', data: data.map((d) => d.heart_rate_bpm), ...lineSeriesEnhancements }]
+            };
+        }
+
+        if (name.includes('Oxygen Saturation')) {
+            const x = data.map((d) => d.date);
+            const enh = commonTimeSeriesEnhancements(x);
+            return {
+                title: {
+                    text: name,
+                    left: 'center',
+                    top: 10,
+                    textStyle: { fontSize: 14, fontWeight: 'bold' }
+                },
+                tooltip: { trigger: 'axis' },
+                xAxis: {
+                    type: 'category',
+                    data: x,
+                    axisLabel: {
+                        rotate: 45,
+                        fontSize: 10,
+                        interval: 0
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    min: 90,
+                    max: 100,
+                    name: '%',
+                    nameLocation: 'middle',
+                    nameGap: 30,
+                    nameTextStyle: { fontSize: 12 }
+                },
+                dataZoom: enh.dataZoom,
+                grid: {
+                    left: 60,
+                    right: 30,
+                    top: 50,
+                    bottom: 80,
+                    containLabel: true
+                },
+                animationDuration: enh.animationDuration,
+                animationEasing: enh.animationEasing,
+                series: [{ name: 'SpO2', type: 'line', data: data.map((d) => d.spo2_percent), ...lineSeriesEnhancements }]
+            };
+        }
+
+        if (name.includes('Blood Pressure Category')) {
+            const x = data.map((d) => d.date);
+            return {
+                title: {
+                    text: name,
+                    left: 'center',
+                    top: 10,
+                    textStyle: { fontSize: 14, fontWeight: 'bold' }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: (params) => {
+                        const p = params[0];
+                        return `${p.axisValue}<br/>${categoryValueToLabel(p.value)} (code ${p.value})`;
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: x,
+                    axisLabel: {
+                        rotate: 45,
+                        fontSize: 10,
+                        interval: 0
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    min: 0,
+                    max: 3,
+                    axisLabel: {
+                        formatter: (v) => categoryValueToLabel(v),
+                        fontSize: 10
+                    }
+                },
+                dataZoom: [
+                    { type: 'inside', xAxisIndex: 0, minSpan: 10 },
+                    { type: 'slider', xAxisIndex: 0 }
+                ],
+                grid: {
+                    left: 60,
+                    right: 30,
+                    top: 50,
+                    bottom: 80,
+                    containLabel: true
+                },
+                series: [
+                    { name: 'Category', type: 'bar', data: data.map((d) => categoryToValue(d.category)), emphasis: { focus: 'series' } }
+                ],
+                visualMap: { show: false, min: 0, max: 3, inRange: { color: ['#2a9d8f', '#29b6f6', '#7c4dff'] } }
+            };
+        }
+
+        if (name.includes('Lab Values Trend')) {
+            const x = data.map((d) => d.date);
+            return {
+                title: {
+                    text: name,
+                    left: 'center',
+                    top: 10,
+                    textStyle: { fontSize: 14, fontWeight: 'bold' }
+                },
+                tooltip: { trigger: 'axis' },
+                legend: {
+                    data: ['Glucose', 'Cholesterol', 'Creatinine'],
+                    top: 35,
+                    left: 'center',
+                    itemGap: 20
+                },
+                xAxis: {
+                    type: 'category',
+                    data: x,
+                    axisLabel: {
+                        rotate: 45,
+                        fontSize: 10,
+                        interval: 0
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'mg/dL',
+                    nameLocation: 'middle',
+                    nameGap: 30,
+                    nameTextStyle: { fontSize: 12 }
+                },
+                dataZoom: [
+                    { type: 'inside', xAxisIndex: 0, minSpan: 10 },
+                    { type: 'slider', xAxisIndex: 0 }
+                ],
+                grid: {
+                    left: 60,
+                    right: 30,
+                    top: 70,
+                    bottom: 80,
+                    containLabel: true
+                },
+                series: [
+                    { name: 'Glucose', type: 'line', data: data.map((d) => d.glucose), ...lineSeriesEnhancements },
+                    { name: 'Cholesterol', type: 'line', data: data.map((d) => d.cholesterol), ...lineSeriesEnhancements },
+                    { name: 'Creatinine', type: 'line', data: data.map((d) => d.creatinine), ...lineSeriesEnhancements }
+                ]
+            };
+        }
+
+        if (name.includes('Medication Adherence')) {
+            const x = data.map((d) => d.date);
+            return {
+                title: { text: name },
+                tooltip: { trigger: 'axis' },
+                xAxis: { type: 'category', data: x },
+                yAxis: { type: 'value', min: 0, max: 100, name: '%' },
+                series: [
+                    { name: 'Adherence', type: 'bar', data: data.map((d) => d.adherence), emphasis: { focus: 'series' } }
+                ],
+                markLine: {
+                    silent: true,
+                    lineStyle: { color: '#e74c3c' },
+                    data: [
+                        { yAxis: 80, label: { formatter: 'Target 80%' } }
+                    ]
+                }
+            };
+        }
+
+        if (name.includes('Symptom Severity Heatmap')) {
+            const symptoms = Array.from(new Set(data.map((d) => d.symptom)));
+            const dates = Array.from(new Set(data.map((d) => d.date)));
+            const matrix = data.map((d) => [symptoms.indexOf(d.symptom), dates.indexOf(d.date), d.severity]);
+            return {
+                title: { text: name },
+                tooltip: { position: 'top' },
+                grid: { height: '70%', top: '10%' },
+                xAxis: { type: 'category', data: dates, splitArea: { show: true } },
+                yAxis: { type: 'category', data: symptoms, splitArea: { show: true } },
+                visualMap: { min: 0, max: 5, calculable: false, orient: 'horizontal', left: 'center', bottom: '2%' },
+                series: [
+                    { name: 'Severity', type: 'heatmap', data: matrix, label: { show: true }, emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.2)' } } }
+                ]
+            };
+        }
+
+        if (name.includes('Risk Score Progression')) {
+            const x = data.map((d) => d.date);
+            return {
+                title: { text: name },
+                tooltip: { trigger: 'axis' },
+                xAxis: { type: 'category', data: x },
+                yAxis: { type: 'value', name: 'Risk Score' },
+                dataZoom: [
+                    { type: 'inside', xAxisIndex: 0, minSpan: 10 },
+                    { type: 'slider', xAxisIndex: 0 }
+                ],
+                series: [
+                    { name: 'Risk Score', type: 'line', data: data.map((d) => d.risk_score), ...lineSeriesEnhancements }
+                ],
+                markLine: {
+                    silent: true,
+                    lineStyle: { color: '#e74c3c' },
+                    data: [
+                        { yAxis: 10, label: { formatter: 'Low Risk 10' } },
+                        { yAxis: 20, label: { formatter: 'High Risk 20' } }
+                    ]
+                }
+            };
+        }
+
         return {
             title: { text: name },
-            xAxis: { type: 'category', data: x },
+            xAxis: { type: 'category', data: data.map((d, i) => d.date || `Item ${i + 1}`) },
             yAxis: { type: 'value' },
-            series: [{ type: 'line', data: yData, ...lineSeriesEnhancements }]
+            series: [{
+                type: 'line',
+                data: data.map((d) => Object.values(d).find((v) => typeof v === 'number') || 0),
+                lineStyle: { color: '#1976d2', width: 2 },
+                itemStyle: { color: '#1976d2' },
+                areaStyle: { color: '#1976d2', opacity: 0.1 }
+            }]
         };
     };
+
+    // KPI sparkline options - Simplified
+    const buildSpark = (label, series, unit) => {
+        // Use actual data or create sample data
+        const data = series.length > 0 ? series : [
+            { date: '2023-01-01', value: 150 },
+            { date: '2023-02-01', value: 152 },
+            { date: '2023-03-01', value: 148 },
+            { date: '2023-04-01', value: 155 },
+            { date: '2023-05-01', value: 153 }
+        ];
+
+        return {
+            title: {
+                text: label,
+                left: 'center',
+                top: 5,
+                textStyle: { fontSize: 11, fontWeight: 'bold', color: '#333' }
+            },
+            grid: {
+                left: 10,
+                right: 10,
+                top: 25,
+                bottom: 10,
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: data.map(s => s.date),
+                axisLabel: { show: false },
+                axisTick: { show: false },
+                axisLine: { show: false },
+                splitLine: { show: false }
+            },
+            yAxis: {
+                type: 'value',
+                axisLabel: { show: false },
+                splitLine: { show: false },
+                axisTick: { show: false },
+                axisLine: { show: false }
+            },
+            series: [{
+                type: 'line',
+                data: data.map(s => s.value),
+                smooth: true,
+                showSymbol: true,
+                symbolSize: 4,
+                lineStyle: {
+                    width: 3,
+                    color: '#1976d2'
+                },
+                itemStyle: {
+                    color: '#1976d2',
+                    borderColor: '#fff',
+                    borderWidth: 1
+                },
+                areaStyle: {
+                    color: {
+                        type: 'linear',
+                        x: 0, y: 0, x2: 0, y2: 1,
+                        colorStops: [
+                            { offset: 0, color: 'rgba(25, 118, 210, 0.3)' },
+                            { offset: 1, color: 'rgba(25, 118, 210, 0.05)' }
+                        ]
+                    }
+                }
+            }],
+            tooltip: {
+                trigger: 'axis',
+                formatter: (p) => `${p[0].axisValue}<br/>${p[0].value} ${unit || ''}`,
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                textStyle: { color: '#fff' }
+            }
+        };
+    };
+
+    const kpiData = (() => {
+        const weight = response.graphs.find(g => g.graph_name.includes('Weight by Encounter'))?.graph_data.map(d => ({ date: d.date, value: d.weight_lb })) || [];
+        const bmi = response.graphs.find(g => g.graph_name.includes('BMI'))?.graph_data.map(d => ({ date: d.date, value: d.bmi })) || [];
+        const bp = response.graphs.find(g => g.graph_name.includes('Blood Pressure by Encounter'))?.graph_data.map(d => ({ date: d.date, value: d.systolic })) || [];
+        const hr = response.graphs.find(g => g.graph_name.includes('Heart Rate'))?.graph_data.map(d => ({ date: d.date, value: d.heart_rate_bpm })) || [];
+
+        return { weight, bmi, bp, hr };
+    })();
 
     if (!patient) {
         return (
@@ -102,39 +734,140 @@ function PatientGraph({ patient }) {
         );
     }
 
-    const graphs = Array.isArray(graphResponse) ? graphResponse : [];
+    // Debug: Log the data to console
+
 
     return (
         <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+            {/* Scrollable Content */}
             <Box sx={{ flex: 1, overflow: "auto", p: 1 }}>
-                <Box sx={{ width: "100%", display: "flex", flexDirection: "column", gap: 2 }}>
-                    {Array.from({ length: Math.ceil(graphs.length / 2) }, (_, rowIndex) => {
-                        const leftGraph = graphs[rowIndex * 2];
-                        const rightGraph = graphs[rowIndex * 2 + 1];
 
-                        if (!leftGraph && !rightGraph) return null;
+                {/* KPI header with sparklines - 4 boxes, 25% each */}
+                <Box sx={{ display: 'flex', width: '100%', gap: 1, mb: 3 }}>
+                    {/* Weight Box - 25% */}
+                    <Box sx={{ width: '25%', display: 'flex', flexDirection: 'column' }}>
+                        <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                            <Typography variant="caption" sx={{ display: 'block', mb: 1, textAlign: 'center', fontWeight: 'bold', fontSize: '12px' }}>
+                                Weight
+                            </Typography>
+                            <Box sx={{ flex: 1, minHeight: '80px' }}>
+                                <ReactECharts
+                                    option={buildSpark('Weight', kpiData.weight, 'lb')}
+                                    style={{ height: '80px', width: '100%' }}
+                                    notMerge={true}
+                                    lazyUpdate={true}
+                                />
+                            </Box>
+                        </Paper>
+                    </Box>
+
+                    {/* BMI Box - 25% */}
+                    <Box sx={{ width: '25%', display: 'flex', flexDirection: 'column' }}>
+                        <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                            <Typography variant="caption" sx={{ display: 'block', mb: 1, textAlign: 'center', fontWeight: 'bold', fontSize: '12px' }}>
+                                BMI
+                            </Typography>
+                            <Box sx={{ flex: 1, minHeight: '80px' }}>
+                                <ReactECharts
+                                    option={buildSpark('BMI', kpiData.bmi, '')}
+                                    style={{ height: '80px', width: '100%' }}
+                                    notMerge={true}
+                                    lazyUpdate={true}
+                                />
+                            </Box>
+                        </Paper>
+                    </Box>
+
+                    {/* SBP Box - 25% */}
+                    <Box sx={{ width: '25%', display: 'flex', flexDirection: 'column' }}>
+                        <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                            <Typography variant="caption" sx={{ display: 'block', mb: 1, textAlign: 'center', fontWeight: 'bold', fontSize: '12px' }}>
+                                SBP
+                            </Typography>
+                            <Box sx={{ flex: 1, minHeight: '80px' }}>
+                                <ReactECharts
+                                    option={buildSpark('SBP', kpiData.bp, 'mmHg')}
+                                    style={{ height: '80px', width: '100%' }}
+                                    notMerge={true}
+                                    lazyUpdate={true}
+                                />
+                            </Box>
+                        </Paper>
+                    </Box>
+
+                    {/* HR Box - 25% */}
+                    <Box sx={{ width: '25%', display: 'flex', flexDirection: 'column' }}>
+                        <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                            <Typography variant="caption" sx={{ display: 'block', mb: 1, textAlign: 'center', fontWeight: 'bold', fontSize: '12px' }}>
+                                HR
+                            </Typography>
+                            <Box sx={{ flex: 1, minHeight: '80px' }}>
+                                <ReactECharts
+                                    option={buildSpark('HR', kpiData.hr, 'bpm')}
+                                    style={{ height: '80px', width: '100%' }}
+                                    notMerge={true}
+                                    lazyUpdate={true}
+                                />
+                            </Box>
+                        </Paper>
+                    </Box>
+                </Box>
+
+                {/* Main graphs - 2 per row, 50% each with proper spacing */}
+                <Box sx={{ width: "100%", display: "flex", flexDirection: "column", gap: 2 }}>
+                    {Array.from({ length: Math.ceil(response.graphs.length / 2) }, (_, rowIndex) => {
+                        const leftGraph = response.graphs[rowIndex * 2];
+                        const rightGraph = response.graphs[rowIndex * 2 + 1];
 
                         return (
                             <Box key={rowIndex} sx={{ display: "flex", width: "100%", gap: 2, minHeight: "320px" }}>
-                                {[leftGraph, rightGraph].map((g, idx) => (
-                                    <Box key={idx} sx={{ width: "50%", display: "flex", flexDirection: "column" }}>
-                                        {g ? (
-                                            <Paper elevation={2} sx={{ p: 2, borderRadius: 2, height: "100%", display: "flex", flexDirection: "column" }}>
-                                                <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2, minHeight: "50px" }}>
-                                                    <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: "14px", flex: 1, mr: 1 }}>
-                                                        {g.graph_name}
-                                                    </Typography>
-                                                    <Typography variant="body2" color="text.secondary" sx={{ fontSize: "11px", lineHeight: 1.3, flex: 1, textAlign: "right" }}>
-                                                        {g.summary_of_day}
-                                                    </Typography>
-                                                </Box>
-                                                <Box sx={{ flex: 1, minHeight: "250px", width: "100%" }}>
-                                                    <ReactECharts option={buildOption(g)} style={{ height: "250px", width: "100%" }} notMerge lazyUpdate />
-                                                </Box>
-                                            </Paper>
-                                        ) : <Box sx={{ height: "100%" }} />}
-                                    </Box>
-                                ))}
+                                {/* Left graph - 50% width */}
+                                <Box sx={{ width: "50%", display: "flex", flexDirection: "column" }}>
+                                    <Paper elevation={2} sx={{ p: 2, borderRadius: 2, height: "100%", display: "flex", flexDirection: "column" }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2, minHeight: "50px" }}>
+                                            <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: "14px", flex: 1, mr: 1 }}>
+                                                {leftGraph.graph_name}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary" sx={{ fontSize: "11px", lineHeight: 1.3, flex: 1, textAlign: "right" }}>
+                                                {leftGraph.summary_of_day}
+                                            </Typography>
+                                        </Box>
+                                        <Box sx={{ flex: 1, minHeight: "250px", width: "100%" }}>
+                                            <ReactECharts
+                                                option={buildOption(leftGraph)}
+                                                style={{ height: "250px", width: "100%" }}
+                                                notMerge={true}
+                                                lazyUpdate={true}
+                                            />
+                                        </Box>
+                                    </Paper>
+                                </Box>
+
+                                {/* Right graph - 50% width */}
+                                <Box sx={{ width: "50%", display: "flex", flexDirection: "column" }}>
+                                    {rightGraph ? (
+                                        <Paper elevation={2} sx={{ p: 2, borderRadius: 2, height: "100%", display: "flex", flexDirection: "column" }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2, minHeight: "50px" }}>
+                                                <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: "14px", flex: 1, mr: 1 }}>
+                                                    {rightGraph.graph_name}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary" sx={{ fontSize: "11px", lineHeight: 1.3, flex: 1, textAlign: "right" }}>
+                                                    {rightGraph.summary_of_day}
+                                                </Typography>
+                                            </Box>
+                                            <Box sx={{ flex: 1, minHeight: "250px", width: "100%" }}>
+                                                <ReactECharts
+                                                    option={buildOption(rightGraph)}
+                                                    style={{ height: "250px", width: "100%" }}
+                                                    notMerge={true}
+                                                    lazyUpdate={true}
+                                                />
+                                            </Box>
+                                        </Paper>
+                                    ) : (
+                                        <Box sx={{ height: "100%" }} />
+                                    )}
+                                </Box>
                             </Box>
                         );
                     })}
