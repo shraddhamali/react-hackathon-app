@@ -32,43 +32,8 @@ export default function TabsPanel({patient, onBackToTable}) {
                 setHealthSignal(patientDetail.ai_response.status_and_risk_factors);
             }
 
-            console.log(patientDetail.ai_response.status_and_risk_factors);
-
-            // const patient = patients.find((p) => p._id === patient._id);
         }
     }, [patient]);
-
-   /* const patientSummary = {
-        "one_liner": "Spanish-speaking 68F with HTN, hyperlipidemia, obesity, osteopenia (lumbar), pre-diabetes with normal A1c, and history of colon polyp; BP controlled on olmesartan/amlodipine; immunizations up to date; 2022 mammogram negative.",
-        "top_problems": [
-            "Essential hypertension",
-            "Hyperlipidemia",
-            "Morbid obesity",
-            "Pre-diabetes",
-            "Osteopenia of lumbar spine",
-            "Chronic low back pain",
-            "GERD without esophagitis",
-            "Colon polyp (repeat colonoscopy due 2029)"
-        ],
-        "allergies": [
-            { "substance": "ACE inhibitors", "reaction": "cough", "noted_date": "2018-10-01" }
-        ],
-        "medications": [
-            { "name": "Olmesartan", "dosage": "40 mg PO daily", "start": "2022-01-31", "status": "active" },
-            { "name": "Amlodipine", "dosage": "2.5 mg PO daily", "start": "2021-11-04", "status": "active" },
-            { "name": "Gabapentin", "dosage": "100 mg PO nightly", "start": "2022-11-28", "status": "active" },
-            { "name": "Ibuprofen", "dosage": "600 mg PO q6h PRN pain", "start": "2022-02-03", "status": "active" },
-            { "name": "Mometasone 0.1% ointment", "dosage": "Apply to affected area daily", "start": "2020-11-13", "status": "active" },
-            { "name": "Diazepam", "dosage": "2 mg PO 30 min before flight; may repeat once PRN", "start": "2020-10-20", "status": "active" },
-            { "name": "Acetaminophen", "dosage": "500 mg PO PRN pain", "start": null, "status": "active" },
-            { "name": "MetroNIDAZOLE 0.75% vaginal gel", "dosage": "1 applicator PV qHS", "start": "2022-01-27", "stop": "2022-02-03", "status": "completed" }
-        ],
-        "recent_encounters": [
-            { "date": "2022-12-16", "encounter": "Breast Health Center", "reason": "Screening mammogram", "outcome": "BI-RADS 1 (negative)" },
-            { "date": "2022-02-03", "encounter": "Family Medicine", "reason": "Hypertension follow-up", "outcome": "BP controlled; vaccines/labs ordered" },
-            { "date": "2022-01-27", "encounter": "Gyn Clinic", "reason": "Vaginal discharge/odor", "outcome": "BV treated with metrogel" }
-        ]
-    };*/
 
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
