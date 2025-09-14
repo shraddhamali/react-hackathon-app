@@ -11,7 +11,7 @@ import {
 } from "react-icons/fa";
 import "./MedicalTimeline.css";
 import Box from "@mui/material/Box";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
 // Map categories to icons
 const categoryIcons = {
@@ -40,7 +40,7 @@ const timelineVariants = {
     visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
-export default function MedicalTimeline({patientId}) {
+export default function MedicalTimeline({ patientId }) {
 
     const [timelineData, setTimelineData] = useState([]);
 
@@ -109,10 +109,10 @@ export default function MedicalTimeline({patientId}) {
                                     <Box
                                         sx={{
                                             position: "absolute",
-                                            left: 6,
+                                            left: 2,
                                             top: 4,
-                                            width: 20,
-                                            height: 20,
+                                            width: 30,
+                                            height: 30,
                                             borderRadius: "50%",
                                             backgroundColor: "#fff",
                                             border: `2px solid ${color}`,
@@ -122,7 +122,7 @@ export default function MedicalTimeline({patientId}) {
                                             zIndex: 2,
                                         }}
                                     >
-                                        <Box sx={{ color: color, fontSize: "12px" }}>
+                                        <Box sx={{ color: color, fontSize: "20px" }}>
                                             {categoryIcons[item.category] || <FaUserMd />}
                                         </Box>
                                     </Box>

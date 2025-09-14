@@ -81,6 +81,101 @@ function PatientGraph({ patient }) {
             };
         }
 
+        // Blood Pressure Chart - Dual line chart
+        if (name.includes('Blood Pressure') || name.includes('BP')) {
+            const x = data.map(d => d.date);
+            const systolic = data.map(d => d.systolic || d.sbp || 0);
+            const diastolic = data.map(d => d.diastolic || d.dbp || 0);
+            return {
+                title: { text: name, left: 'center', top: 10, textStyle: { fontSize: 14, fontWeight: 'bold' } },
+                tooltip: { trigger: 'axis' },
+                legend: { data: ['Systolic', 'Diastolic'], top: 30 },
+                xAxis: { type: 'category', data: x, axisLabel: { rotate: 45, fontSize: 10 } },
+                yAxis: { type: 'value', name: 'mmHg', nameLocation: 'middle', nameGap: 30 },
+                grid: { left: 60, right: 30, top: 60, bottom: 80, containLabel: true },
+                series: [
+                    { name: 'Systolic', type: 'line', data: systolic, itemStyle: { color: '#e74c3c' }, lineStyle: { color: '#e74c3c', width: 3 } },
+                    { name: 'Diastolic', type: 'line', data: diastolic, itemStyle: { color: '#3498db' }, lineStyle: { color: '#3498db', width: 3 } }
+                ]
+            };
+        }
+
+        // Heart Rate Chart - Bar chart
+        if (name.includes('Heart Rate') || name.includes('Pulse')) {
+            const x = data.map(d => d.date);
+            const heartRates = data.map(d => d.heart_rate ?? d.pulse ?? d.hr ?? 0);
+            return {
+                title: { text: name, left: 'center', top: 10, textStyle: { fontSize: 14, fontWeight: 'bold' } },
+                tooltip: { trigger: 'axis' },
+                xAxis: { type: 'category', data: x, axisLabel: { rotate: 45, fontSize: 10 } },
+                yAxis: { type: 'value', name: 'BPM', nameLocation: 'middle', nameGap: 30 },
+                grid: { left: 60, right: 30, top: 50, bottom: 80, containLabel: true },
+                series: [{
+                    name: 'Heart Rate',
+                    type: 'bar',
+                    data: heartRates,
+                    itemStyle: {
+                        color: {
+                            type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [
+                                { offset: 0, color: '#ff6b6b' },
+                                { offset: 0.5, color: '#4ecdc4' },
+                                { offset: 1, color: '#45b7d1' }
+                            ]
+                        },
+                        borderRadius: [4, 4, 0, 0]
+                    }
+                }]
+            };
+        }
+
+        // Lab Values Chart - Scatter plot
+        if (name.includes('Lab') || name.includes('Glucose') || name.includes('Cholesterol')) {
+            const x = data.map((d, i) => i);
+            const values = data.map(d => Object.values(d).find(v => typeof v === 'number') ?? 0);
+            const dates = data.map(d => d.date);
+            return {
+                title: { text: name, left: 'center', top: 10, textStyle: { fontSize: 14, fontWeight: 'bold' } },
+                tooltip: { trigger: 'item' },
+                xAxis: { type: 'category', data: dates, axisLabel: { rotate: 45, fontSize: 10 } },
+                yAxis: { type: 'value', name: 'Value', nameLocation: 'middle', nameGap: 30 },
+                grid: { left: 60, right: 30, top: 50, bottom: 80, containLabel: true },
+                series: [{
+                    name: 'Lab Values',
+                    type: 'scatter',
+                    data: values.map((v, i) => [i, v]),
+                    symbolSize: 8,
+                    itemStyle: { color: '#9c27b0' }
+                }]
+            };
+        }
+
+        // Temperature Chart - Gauge chart
+        if (name.includes('Temperature') || name.includes('Temp')) {
+            const latestTemp = data[data.length - 1]?.temperature || data[data.length - 1]?.temp || 98.6;
+            return {
+                title: { text: name, left: 'center', top: 10, textStyle: { fontSize: 14, fontWeight: 'bold' } },
+                series: [{
+                    name: 'Temperature',
+                    type: 'gauge',
+                    center: ['50%', '60%'],
+                    startAngle: 200,
+                    endAngle: -20,
+                    min: 95,
+                    max: 105,
+                    splitNumber: 10,
+                    itemStyle: { color: latestTemp > 100 ? '#ff4757' : latestTemp > 99 ? '#ffa502' : '#2ed573' },
+                    progress: { show: true, width: 18 },
+                    pointer: { show: true, itemStyle: { color: 'auto' } },
+                    axisLine: { lineStyle: { width: 18 } },
+                    axisTick: { distance: -30, splitNumber: 5, lineStyle: { width: 2, color: 'auto' } },
+                    splitLine: { distance: -30, length: 30, lineStyle: { width: 4, color: 'auto' } },
+                    axisLabel: { distance: -20, color: 'auto', fontSize: 12 },
+                    detail: { valueAnimation: true, formatter: '{value}°F', color: 'auto' },
+                    data: [{ value: latestTemp, name: 'Temperature' }]
+                }]
+            };
+        }
+
         // fallback generic line chart
         const x = data.map((d, i) => d.date || `Item ${i + 1}`);
         const yData = data.map(d => Object.values(d).find(v => typeof v === 'number') ?? 0);
