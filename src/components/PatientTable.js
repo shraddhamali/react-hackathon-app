@@ -1,88 +1,124 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
     Table, TableBody, TableCell, TableContainer,
-    TableHead, TableRow, Paper, Typography, Box
+    TableHead, TableRow, Paper, Typography, Box, Button, CircularProgress
 } from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 export default function PatientTable({ onRowClick }) {
-    const patients = [
-        {
-            patient_id: "01714983",
-            name: { first: "Maria Blanca", last: "Alfaro" },
-            dob: "1956-12-06",
-            sex: "F",
-            age: 68,
-            contact: { phone: "510-223-8761", email: null },
-            address: {
-                line1: "348 HANOVER ST",
-                city: "SAN FRANCISCO",
-                state: "CA",
-                zip: "94112",
-            },
-        },
-        {
-            patient_id: "01876244",
-            name: { first: "John", last: "Doe" },
-            dob: "1970-04-15",
-            sex: "M",
-            age: 54,
-            contact: { phone: "415-555-1234", email: "johndoe@example.com" },
-            address: {
-                line1: "124 MARKET ST",
-                city: "OAKLAND",
-                state: "CA",
-                zip: "94607",
-            },
-        },
-        {
-            patient_id: "01984322",
-            name: { first: "Alice", last: "Johnson" },
-            dob: "1985-09-23",
-            sex: "F",
-            age: 39,
-            contact: { phone: "650-555-8765", email: "alice.j@example.com" },
-            address: {
-                line1: "789 PINE AVE",
-                city: "SAN JOSE",
-                state: "CA",
-                zip: "95112",
-            },
-        },
-        {
-            patient_id: "02014567",
-            name: { first: "Robert", last: "Lee" },
-            dob: "1992-01-10",
-            sex: "M",
-            age: 33,
-            contact: { phone: "510-987-6543", email: null },
-            address: {
-                line1: "456 BROADWAY ST",
-                city: "BERKELEY",
-                state: "CA",
-                zip: "94704",
-            },
-        },
-    ];
+    const [patientDemographics, setPatients] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const fileInputRef = useRef(null);
+
+    // Fetch patients function
+    const fetchPatients = async () => {
+        try {
+            const res = await fetch("https://3f975fd866ec.ngrok-free.app/patients/");
+            const data = await res.json();
+            const demographics = data.patients.map((p) => ({
+                ...p.ai_response.patient_demographics,
+                _id: p._id,
+            }));
+
+            // Update local storage
+            localStorage.setItem("patientData", JSON.stringify(data));
+            localStorage.setItem("patientDemographics", JSON.stringify(demographics));
+
+            setPatients(demographics);
+        } catch (err) {
+            console.error("Error fetching patients:", err);
+        }
+    };
+
+    useEffect(() => {
+        // Load saved demographics first
+        const saved = localStorage.getItem("patientDemographics");
+        if (saved) {
+            setPatients(JSON.parse(saved));
+        }
+        // Then fetch fresh data
+        fetchPatients();
+    }, []);
+
+    // Convert file to Base64
+    const toBase64 = (file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = error => reject(error);
+    });
+
+    // Trigger file input click
+    const handleButtonClick = () => {
+        if (fileInputRef.current) fileInputRef.current.click();
+    };
+
+    // Handle file selection and upload
+    const handleFileChange = async (e) => {
+        const selectedFile = e.target.files[0];
+        if (!selectedFile) return;
+
+        setLoading(true); // start loading
+        try {
+            const base64File = await toBase64(selectedFile);
+
+            const payload = {
+                filename: selectedFile.name,
+                pdf_base64: base64File,
+            };
+
+            const response = await fetch("https://3f975fd866ec.ngrok-free.app/process-pdf/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+
+            const result = await response.json();
+            console.log("Upload response:", result);
+            alert("Document uploaded successfully!");
+
+            // Reset local storage and fetch updated patients
+            localStorage.removeItem("patientData");
+            localStorage.removeItem("patientDemographics");
+            await fetchPatients();
+        } catch (err) {
+            console.error("Upload error:", err);
+            alert("Failed to upload document");
+        } finally {
+            setLoading(false); // stop loading
+        }
+    };
 
     return (
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
-            <TableContainer
-                component={Paper}
-                sx={{
-                    width: "90%",
-                    borderRadius: 3,
-                    boxShadow: 4,
-                }}
-            >
-                {/* Header */}
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 6 }}>
+            {/* Upload Button */}
+            <Box sx={{ mb: 2, width: "90%", display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 2 }}>
+                <input
+                    type="file"
+                    accept="application/pdf"
+                    ref={fileInputRef}
+                    style={{ display: "none" }}
+                    onChange={handleFileChange}
+                />
+
+                <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<CloudUploadIcon />}
+                    onClick={handleButtonClick}
+                    disabled={loading}
+                >
+                    {loading ? "Uploading..." : "Upload Patient Document"}
+                </Button>
+
+                {loading && <CircularProgress size={24} />}
+            </Box>
+
+            {/* Table */}
+            <TableContainer component={Paper} sx={{ width: "90%", borderRadius: 3, boxShadow: 4 }}>
                 <Typography
                     variant="h6"
-                    sx={{
-                        p: 2,
-                        fontWeight: "bold",
-                        borderBottom: "1px solid #ddd",
-                        backgroundColor: "#f1f3f6",
-                    }}
+                    sx={{ p: 2, fontWeight: "bold", borderBottom: "1px solid #ddd", backgroundColor: "#f1f3f6" }}
                 >
                     Patient Demographics
                 </Typography>
@@ -100,21 +136,16 @@ export default function PatientTable({ onRowClick }) {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {patients.map((patient) => (
+                        {patientDemographics.map((patient) => (
                             <TableRow
                                 key={patient.patient_id}
                                 hover
-                                sx={{
-                                    cursor: "pointer",
-                                    "&:hover": { backgroundColor: "#e3f2fd" },
-                                }}
+                                sx={{ cursor: "pointer", "&:hover": { backgroundColor: "#e3f2fd" } }}
                                 onClick={() => onRowClick(patient)}
                             >
                                 <TableCell>{patient.patient_id}</TableCell>
                                 <TableCell>{`${patient.name.first} ${patient.name.last}`}</TableCell>
-                                <TableCell>
-                                    {new Date(patient.dob).toLocaleDateString("en-US")}
-                                </TableCell>
+                                <TableCell>{new Date(patient.dob).toLocaleDateString("en-US")}</TableCell>
                                 <TableCell>{patient.sex}</TableCell>
                                 <TableCell>{patient.age}</TableCell>
                                 <TableCell>
@@ -122,15 +153,11 @@ export default function PatientTable({ onRowClick }) {
                                     {patient.contact.email && (
                                         <>
                                             <br />
-                                            <a href={`mailto:${patient.contact.email}`}>
-                                                {patient.contact.email}
-                                            </a>
+                                            <a href={`mailto:${patient.contact.email}`}>{patient.contact.email}</a>
                                         </>
                                     )}
                                 </TableCell>
-                                <TableCell>
-                                    {`${patient.address.line1}, ${patient.address.city}, ${patient.address.state} ${patient.address.zip}`}
-                                </TableCell>
+                                <TableCell>{`${patient.address.line1}, ${patient.address.city}, ${patient.address.state} ${patient.address.zip}`}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
