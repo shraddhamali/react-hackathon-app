@@ -441,7 +441,8 @@ export default function TabsPanel({ patient, onBackToTable }) {
                                     overflow: "auto",
                                     minHeight: "calc(100vh - 80px)"
                                 }}>
-                                    <MedicalTimeline />
+                                    <MedicalTimeline
+                                        patientId={patient._id}/>
                                 </Box>
                             </Paper>
                         </Box>

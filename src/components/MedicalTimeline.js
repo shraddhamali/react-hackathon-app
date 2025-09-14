@@ -1,6 +1,4 @@
-// components/MedicalTimeline.js
 
-import React from "react";
 import { motion } from "framer-motion";
 import {
     FaHeartbeat,
@@ -13,99 +11,7 @@ import {
 } from "react-icons/fa";
 import "./MedicalTimeline.css";
 import Box from "@mui/material/Box";
-
-const data = [
-    {
-        date: "2015-03-10",
-        category: "procedure",
-        title: "Dilation and curettage",
-        details: "For postmenopausal bleeding; prior simple endometrial hyperplasia without atypia."
-    },
-    {
-        date: "2017-01-30",
-        category: "imaging",
-        title: "Tdap immunization",
-        details: "Tdap (Adacel) administered."
-    },
-    {
-        date: "2020-06-23",
-        category: "immunization",
-        title: "Zoster (Shingrix)",
-        details: "Dose 1 administered; dose 2 on 2020-10-20."
-    },
-    {
-        date: "2021-11-10",
-        category: "lab",
-        title: "Lipid panel and CMP/CBC",
-        details: "Total cholesterol 210 mg/dL (H), LDL 143 mg/dL (H), glucose 106 mg/dL (H), BUN 23 mg/dL (H), creatinine 0.86 mg/dL, eGFR 71, Hgb 13.2 g/dL."
-    },
-    {
-        date: "2021-11-17",
-        category: "immunization",
-        title: "Pfizer COVID-19 booster",
-        details: "Bivalent booster (external source)."
-    },
-    {
-        date: "2022-01-27",
-        category: "encounter",
-        title: "GYN visit – Bacterial vaginosis",
-        details: "Complaints of fishy vaginal discharge; exam consistent with BV; prescribed metronidazole 0.75% vaginal gel nightly x7 days."
-    },
-    {
-        date: "2022-02-03",
-        category: "encounter",
-        title: "Primary care visit – HTN follow-up",
-        details: "BP 123/74; chronic low back pain; GERD; ordered H. pylori breath test and A1c; prescribed ibuprofen 600 mg PRN; Pneumovax 23 given."
-    },
-    {
-        date: "2022-02-03",
-        category: "lab",
-        title: "Hemoglobin A1c",
-        details: "A1c 5.5%."
-    },
-    {
-        date: "2022-02-06",
-        category: "lab",
-        title: "H. pylori urea breath test",
-        details: "Not detected."
-    },
-    {
-        date: "2022-02-14",
-        category: "imaging",
-        title: "DEXA bone density",
-        details: "Lumbar spine T-score -1.2 (osteopenic); total hip 0.7; femoral neck -0.4; FRAX major 3.5%, hip 0.1%."
-    },
-    {
-        date: "2022-03-05",
-        category: "note",
-        title: "Telephone encounter",
-        details: "Patient informed she does not have osteoporosis."
-    },
-    {
-        date: "2022-04-19",
-        category: "immunization",
-        title: "Pfizer SARS-CoV-2 (tris-sucrose)",
-        details: "COVID-19 vaccine administered."
-    },
-    {
-        date: "2022-12-12",
-        category: "immunization",
-        title: "PCV13 (Prevnar 13)",
-        details: "Pneumococcal conjugate vaccine administered."
-    },
-    {
-        date: "2022-12-16",
-        category: "imaging",
-        title: "Screening mammogram",
-        details: "BI-RADS 1 (negative); almost entirely fatty breasts; no suspicious findings."
-    },
-    {
-        date: "2022-11-28",
-        category: "medication",
-        title: "Medication renewals",
-        details: "Olmesartan 40 mg daily; gabapentin 100 mg nightly."
-    }
-];
+import {useEffect, useState} from "react";
 
 // Map categories to icons
 const categoryIcons = {
@@ -134,7 +40,24 @@ const timelineVariants = {
     visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
-export default function MedicalTimeline() {
+export default function MedicalTimeline({patientId}) {
+
+    const [timelineData, setTimelineData] = useState([]);
+
+    useEffect(() => {
+        // Load patientData from localStorage
+        const storedData = localStorage.getItem("patientData");
+        if (storedData) {
+            const patients = JSON.parse(storedData).patients || [];
+
+            const patient = patients.find((p) => p._id === patientId);
+
+            if (patient && patient.ai_response && patient.ai_response.patient_timeline) {
+                setTimelineData(patient.ai_response.patient_timeline);
+            }
+        }
+    }, [patientId]);
+
     return (
         <Box
             sx={{
@@ -147,7 +70,6 @@ export default function MedicalTimeline() {
                 flexDirection: "column",
             }}
         >
-
             {/* Scrollable Content */}
             <Box sx={{ flex: 1, overflowY: "auto", overflowX: "hidden", p: 1 }}>
                 <Box sx={{ position: "relative" }}>
@@ -163,7 +85,7 @@ export default function MedicalTimeline() {
                         }}
                     />
 
-                    {data.map((item, index) => {
+                    {timelineData.map((item, index) => {
                         const color = categoryColors[item.category] || "#007bff";
                         return (
                             <motion.div
@@ -247,6 +169,5 @@ export default function MedicalTimeline() {
                 </Box>
             </Box>
         </Box>
-
     );
 }

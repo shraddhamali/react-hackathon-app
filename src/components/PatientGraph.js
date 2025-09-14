@@ -721,7 +721,6 @@ function PatientGraph({ patient }) {
         const bp = response.graphs.find(g => g.graph_name.includes('Blood Pressure by Encounter'))?.graph_data.map(d => ({ date: d.date, value: d.systolic })) || [];
         const hr = response.graphs.find(g => g.graph_name.includes('Heart Rate'))?.graph_data.map(d => ({ date: d.date, value: d.heart_rate_bpm })) || [];
 
-        console.log('KPI Data Debug:', { weight, bmi, bp, hr });
         return { weight, bmi, bp, hr };
     })();
 
@@ -736,9 +735,7 @@ function PatientGraph({ patient }) {
     }
 
     // Debug: Log the data to console
-    console.log('PatientGraph - Patient:', patient);
-    console.log('PatientGraph - Response:', response);
-    console.log('PatientGraph - KPI Data:', kpiData);
+
 
     return (
         <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
