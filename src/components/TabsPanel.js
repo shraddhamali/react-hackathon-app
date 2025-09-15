@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Divider, Paper, Tab, Tabs, Typography } from "@mui/material";
+import { Box, Divider, Paper, Tab, Tabs, Typography, Grid } from "@mui/material";
 import MedicalTimeline from "./MedicalTimeline";
 import PatientGraph from "./PatientGraph";
 import Chatbot from "./chatbot";
@@ -11,6 +11,7 @@ export default function TabsPanel({ patient }) {
     const [patientSummaryResponse, setPatientSummary] = useState([]);
 
     const [healthSignalResponse, setHealthSignal] = useState([]);
+    const [trendsData, setTrendsData] = useState([]);
 
 
     useEffect(() => {
@@ -28,6 +29,10 @@ export default function TabsPanel({ patient }) {
 
             if (patientDetail && patientDetail.ai_response && patientDetail.ai_response.status_and_risk_factors) {
                 setHealthSignal(patientDetail.ai_response.status_and_risk_factors);
+            }
+
+            if (patientDetail && patientDetail.ai_response && patientDetail.ai_response.graphs) {
+                setTrendsData(patientDetail.ai_response.graphs);
             }
 
         }
@@ -174,8 +179,8 @@ export default function TabsPanel({ patient }) {
                                         <b>Name:</b> {patient.name.first} {patient.name.last}
                                     </Typography>
                                     <Typography variant="body1" sx={{ fontSize: "14px", fontWeight: "bold" }}>
-                                      <b>DOB:</b>{" "}
-                                      {patient.dob ? new Date(patient.dob).toLocaleDateString("en-US") : ""}
+                                        <b>DOB:</b>{" "}
+                                        {patient.dob ? new Date(patient.dob).toLocaleDateString("en-US") : ""}
                                     </Typography>
                                     <Typography variant="body1" sx={{ fontSize: "14px", fontWeight: "bold" }}>
                                         <b>Sex:</b> {patient.sex}
@@ -188,16 +193,16 @@ export default function TabsPanel({ patient }) {
                                         {patient.contact.email && ` | ${patient.contact.email}`}
                                     </Typography>
                                     <Typography variant="body1" sx={{ fontSize: "14px", fontWeight: "bold" }}>
-                                     <b>Address:</b>{" "}
-                                     {[
-                                       patient.address?.line1,
-                                       patient.address?.city,
-                                       patient.address?.state,
-                                       patient.address?.zip,
-                                     ]
-                                       .filter(Boolean) // removes empty/null/undefined
-                                       .join(", ")}
-                                   </Typography>
+                                        <b>Address:</b>{" "}
+                                        {[
+                                            patient.address?.line1,
+                                            patient.address?.city,
+                                            patient.address?.state,
+                                            patient.address?.zip,
+                                        ]
+                                            .filter(Boolean) // removes empty/null/undefined
+                                            .join(", ")}
+                                    </Typography>
                                 </Paper>
                             </Box>
 
@@ -459,16 +464,123 @@ export default function TabsPanel({ patient }) {
                         gap: 2,
                         height: "100%"
                     }}>
-                        {/* Medical Graphs Title */}
+                        {/* Trends Title */}
                         <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                             <Typography variant="h5" sx={{ fontWeight: "bold", fontSize: "20px" }}>
-                                Medical Graphs - {patient.name.first} {patient.name.last}
+                                📊 Trends & Analytics - {patient.name.first} {patient.name.last}
                             </Typography>
                         </Box>
 
-                        {/* Medical Graphs - 2 per row */}
-                        <Box sx={{ flex: 1, overflow: "auto" }}>
-                            <PatientGraph patient={patient} />
+                        {/* All Graphs - 2 per row */}
+                        <Box sx={{ flex: 1, overflow: "auto", p: 1 }}>
+                            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                                {Array.from({ length: Math.ceil(trendsData.length / 2) }, (_, rowIndex) => {
+                                    const leftGraph = trendsData[rowIndex * 2];
+                                    const rightGraph = trendsData[rowIndex * 2 + 1];
+
+                                    return (
+                                        <Box key={rowIndex} sx={{ display: "flex", width: "100%", gap: 2, minHeight: "400px" }}>
+                                            {/* Left graph - 50% width */}
+                                            <Box sx={{ width: "50%", display: "flex", flexDirection: "column" }}>
+                                                <Paper elevation={2} sx={{
+                                                    p: 2,
+                                                    borderRadius: 2,
+                                                    height: "100%",
+                                                    display: "flex",
+                                                    flexDirection: "column"
+                                                }}>
+                                                    <Box sx={{
+                                                        display: 'flex',
+                                                        alignItems: 'flex-start',
+                                                        justifyContent: 'space-between',
+                                                        mb: 2,
+                                                        minHeight: "50px"
+                                                    }}>
+                                                        <Typography variant="h6" sx={{
+                                                            fontWeight: 'bold',
+                                                            fontSize: "14px",
+                                                            flex: 1,
+                                                            mr: 1
+                                                        }}>
+                                                            {leftGraph?.graph_name}
+                                                        </Typography>
+                                                        <Typography variant="body2" color="text.secondary" sx={{
+                                                            fontSize: "11px",
+                                                            lineHeight: 1.3,
+                                                            flex: 1,
+                                                            textAlign: "right"
+                                                        }}>
+                                                            {leftGraph?.summary_of_day}
+                                                        </Typography>
+                                                    </Box>
+                                                    <Box sx={{
+                                                        flex: 1,
+                                                        minHeight: "320px",
+                                                        width: "100%"
+                                                    }}>
+                                                        <PatientGraph
+                                                            patient={patient}
+                                                            specificGraph={leftGraph}
+                                                            showKPI={false}
+                                                        />
+                                                    </Box>
+                                                </Paper>
+                                            </Box>
+
+                                            {/* Right graph - 50% width */}
+                                            <Box sx={{ width: "50%", display: "flex", flexDirection: "column" }}>
+                                                {rightGraph ? (
+                                                    <Paper elevation={2} sx={{
+                                                        p: 2,
+                                                        borderRadius: 2,
+                                                        height: "100%",
+                                                        display: "flex",
+                                                        flexDirection: "column"
+                                                    }}>
+                                                        <Box sx={{
+                                                            display: 'flex',
+                                                            alignItems: 'flex-start',
+                                                            justifyContent: 'space-between',
+                                                            mb: 2,
+                                                            minHeight: "50px"
+                                                        }}>
+                                                            <Typography variant="h6" sx={{
+                                                                fontWeight: 'bold',
+                                                                fontSize: "14px",
+                                                                flex: 1,
+                                                                mr: 1
+                                                            }}>
+                                                                {rightGraph.graph_name}
+                                                            </Typography>
+                                                            <Typography variant="body2" color="text.secondary" sx={{
+                                                                fontSize: "11px",
+                                                                lineHeight: 1.3,
+                                                                flex: 1,
+                                                                textAlign: "right"
+                                                            }}>
+                                                                {rightGraph.summary_of_day}
+                                                            </Typography>
+                                                        </Box>
+                                                        <Box sx={{
+                                                            flex: 1,
+                                                            minHeight: "320px",
+                                                            width: "100%"
+                                                        }}>
+                                                            <PatientGraph
+                                                                patient={patient}
+                                                                specificGraph={rightGraph}
+                                                                showKPI={false}
+                                                            />
+                                                        </Box>
+                                                    </Paper>
+                                                ) : (
+                                                    <Box sx={{ width: "100%", height: "400px" }} />
+                                                )}
+                                            </Box>
+                                        </Box>
+                                    );
+                                })}
+                            </Box>
                         </Box>
                     </Box>
                 )}
