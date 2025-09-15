@@ -7,22 +7,22 @@ import { Box, Typography, Paper, Grid } from '@mui/material';
 const COOL_THEME = {
     color: ['#0097a7', '#1e88e5', '#7c4dff', '#2a9d8f', '#8e24aa', '#00e5ff', '#42a5f5', '#5c9cff'],
     backgroundColor: '#ffffff',
-    textStyle: { color: '#1f2d3d' },
-    title: { textStyle: { color: '#1f2d3d', fontWeight: '600' }, subtextStyle: { color: '#607d8b' } },
-    tooltip: { backgroundColor: 'rgba(38,50,56,0.92)', borderWidth: 0, textStyle: { color: '#e0f7fa' } },
-    legend: { textStyle: { color: '#37474f' } },
+    textStyle: { color: '#1f2d3d', fontFamily: 'Poppins' },
+    title: { textStyle: { color: '#1f2d3d', fontWeight: '600', fontFamily: 'Poppins' }, subtextStyle: { color: '#607d8b', fontFamily: 'Poppins' } },
+    tooltip: { backgroundColor: 'rgba(38,50,56,0.92)', borderWidth: 0, textStyle: { color: '#e0f7fa', fontFamily: 'Poppins' } },
+    legend: { textStyle: { color: '#37474f', fontFamily: 'Poppins' } },
     axisPointer: { lineStyle: { color: '#80deea' }, crossStyle: { color: '#80deea' } },
     grid: { containLabel: true },
     categoryAxis: {
         axisLine: { lineStyle: { color: '#90a4ae' } },
         axisTick: { lineStyle: { color: '#90a4ae' } },
-        axisLabel: { color: '#455a64' },
+        axisLabel: { color: '#455a64', fontFamily: 'Poppins' },
         splitLine: { show: false }
     },
     valueAxis: {
         axisLine: { show: false },
         axisTick: { show: false },
-        axisLabel: { color: '#455a64' },
+        axisLabel: { color: '#455a64', fontFamily: 'Poppins' },
         splitLine: { lineStyle: { color: '#eceff1' } }
     },
     dataZoom: [
@@ -30,12 +30,12 @@ const COOL_THEME = {
             fillerColor: 'rgba(0, 151, 167, 0.18)',
             handleStyle: { color: '#0097a7', borderColor: '#0097a7' },
             moveHandleStyle: { color: '#0097a7' },
-            textStyle: { color: '#546e7a' }
+            textStyle: { color: '#546e7a', fontFamily: 'Poppins' }
         },
         {
             handleStyle: { color: '#5e35b1', borderColor: '#5e35b1' },
             moveHandleStyle: { color: '#5e35b1' },
-            textStyle: { color: '#546e7a' }
+            textStyle: { color: '#546e7a', fontFamily: 'Poppins' }
         }
     ],
     line: { smooth: true, symbolSize: 6 },
@@ -44,20 +44,20 @@ const COOL_THEME = {
 };
 echarts.registerTheme('cool-med', COOL_THEME);
 
-function PatientGraph({ patient }) {
+function PatientGraph({ patient, specificGraph, showKPI = true }) {
     // Generate comprehensive medical data with multiple visualization types
     const response = useMemo(() => {
         if (!patient) return { graphs: [] };
 
-       /* // Generate sample data based on patient age and demographics
-        const baseWeight = patient.sex === "M" ? 180 : 150;
-        const ageFactor = patient.age / 50;
-        const baseWeightAdjusted = baseWeight + ageFactor * 20;
-
-        const baseBP =
-            patient.age > 60
-                ? { systolic: 140, diastolic: 85 }
-                : { systolic: 120, diastolic: 80 };*/
+        /* // Generate sample data based on patient age and demographics
+         const baseWeight = patient.sex === "M" ? 180 : 150;
+         const ageFactor = patient.age / 50;
+         const baseWeightAdjusted = baseWeight + ageFactor * 20;
+ 
+         const baseBP =
+             patient.age > 60
+                 ? { systolic: 140, diastolic: 85 }
+                 : { systolic: 120, diastolic: 80 };*/
 
         // 🔹 Get from localStorage instead of static graphs
         const storedData = localStorage.getItem("patientData");
@@ -111,17 +111,18 @@ function PatientGraph({ patient }) {
 
     const buildOption = (graph) => {
         const name = graph.graph_name;
+        const type = graph.graph_type;
         const data = [...graph.graph_data];
         if (data.length && data[0].date) {
             data.sort((a, b) => toDate(a.date) - toDate(b.date));
         }
 
-        if (name.includes('Weight by Encounter')) {
+        if (type === 'line' || graph.graph_name.includes('Weight by Encounter')) {
             const x = data.map((d) => d.date);
             const enh = commonTimeSeriesEnhancements(x);
             return {
                 title: {
-                    text: name,
+                    text: graph.graph_name,
                     left: 'center',
                     top: 10,
                     textStyle: { fontSize: 14, fontWeight: 'bold' }
@@ -157,7 +158,7 @@ function PatientGraph({ patient }) {
             };
         }
 
-        if (name.includes('BMI')) {
+        if (type === 'line' && (name.includes('BMI') || data[0]?.bmi !== undefined)) {
             const x = data.map((d) => d.date);
             const enh = commonTimeSeriesEnhancements(x);
             return {
@@ -203,7 +204,7 @@ function PatientGraph({ patient }) {
             };
         }
 
-        if (name.includes('Blood Pressure by Encounter')) {
+        if (type === 'line' && (name.includes('Blood Pressure') || data[0]?.systolic !== undefined)) {
             const x = data.map((d) => d.date);
             const enh = commonTimeSeriesEnhancements(x);
             return {
@@ -262,7 +263,7 @@ function PatientGraph({ patient }) {
             };
         }
 
-        if (name.includes('Heart Rate')) {
+        if (type === 'line' && (name.includes('Heart Rate') || data[0]?.heart_rate_bpm !== undefined)) {
             const x = data.map((d) => d.date);
             const enh = commonTimeSeriesEnhancements(x);
             return {
@@ -303,7 +304,7 @@ function PatientGraph({ patient }) {
             };
         }
 
-        if (name.includes('Oxygen Saturation')) {
+        if (type === 'line' && (name.includes('Oxygen Saturation') || data[0]?.spo2_percent !== undefined)) {
             const x = data.map((d) => d.date);
             const enh = commonTimeSeriesEnhancements(x);
             return {
@@ -346,7 +347,7 @@ function PatientGraph({ patient }) {
             };
         }
 
-        if (name.includes('Blood Pressure Category')) {
+        if (type === 'bar' || name.includes('Blood Pressure Category')) {
             const x = data.map((d) => d.date);
             return {
                 title: {
@@ -398,7 +399,7 @@ function PatientGraph({ patient }) {
             };
         }
 
-        if (name.includes('Lab Values Trend')) {
+        if (type === 'multiline' || name.includes('Lab Values Trend')) {
             const x = data.map((d) => d.date);
             return {
                 title: {
@@ -449,7 +450,7 @@ function PatientGraph({ patient }) {
             };
         }
 
-        if (name.includes('Medication Adherence')) {
+        if (type === 'bar' && (name.includes('Medication Adherence') || data[0]?.adherence !== undefined)) {
             const x = data.map((d) => d.date);
             return {
                 title: { text: name },
@@ -469,7 +470,7 @@ function PatientGraph({ patient }) {
             };
         }
 
-        if (name.includes('Symptom Severity Heatmap')) {
+        if (type === 'heatmap' || name.includes('Symptom Severity Heatmap')) {
             const symptoms = Array.from(new Set(data.map((d) => d.symptom)));
             const dates = Array.from(new Set(data.map((d) => d.date)));
             const matrix = data.map((d) => [symptoms.indexOf(d.symptom), dates.indexOf(d.date), d.severity]);
@@ -486,7 +487,7 @@ function PatientGraph({ patient }) {
             };
         }
 
-        if (name.includes('Risk Score Progression')) {
+        if (type === 'line' && (name.includes('Risk Score Progression') || data[0]?.risk_score !== undefined)) {
             const x = data.map((d) => d.date);
             return {
                 title: { text: name },
@@ -511,8 +512,155 @@ function PatientGraph({ patient }) {
             };
         }
 
+        if (type === 'timeline') {
+            const x = data.map((d) => d.date);
+            return {
+                title: {
+                    text: name,
+                    left: 'center',
+                    top: 10,
+                    textStyle: { fontSize: 14, fontWeight: 'bold' }
+                },
+                tooltip: { trigger: 'axis' },
+                xAxis: {
+                    type: 'category',
+                    data: x,
+                    axisLabel: {
+                        rotate: 45,
+                        fontSize: 10,
+                        interval: 0
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: 'Value',
+                    nameLocation: 'middle',
+                    nameGap: 30,
+                    nameTextStyle: { fontSize: 12 }
+                },
+                series: [{
+                    name: 'Timeline',
+                    type: 'scatter',
+                    data: data.map((d, index) => ({
+                        name: d.date || `Event ${index + 1}`,
+                        value: [index, Object.values(d).find((v) => typeof v === 'number') || 0],
+                        itemStyle: { color: '#1976d2' }
+                    })),
+                    symbolSize: 8,
+                    itemStyle: { color: '#1976d2' },
+                    emphasis: { focus: 'series' }
+                }]
+            };
+        }
+
+        if (type === 'gantt') {
+            // Convert dates to timestamps for proper gantt chart rendering
+            const tasks = data.map((d, index) => {
+                const startDate = new Date(d.start);
+                const endDate = new Date(d.end);
+                const duration = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)); // Duration in days
+
+                return {
+                    name: d.task,
+                    start: startDate.getTime(),
+                    end: endDate.getTime(),
+                    duration: duration,
+                    index: index
+                };
+            });
+
+            // Get all unique dates for x-axis
+            const allDates = [...new Set(data.flatMap(d => [d.start, d.end]))].sort();
+            const xAxisData = allDates;
+
+            // Create gantt chart data
+            const ganttData = tasks.map((task, index) => {
+                const startIndex = xAxisData.indexOf(data[index].start);
+                const endIndex = xAxisData.indexOf(data[index].end);
+
+                return {
+                    name: task.name,
+                    value: [startIndex, endIndex, task.duration],
+                    itemStyle: { color: '#1976d2' }
+                };
+            });
+
+            return {
+                title: {
+                    text: graph.graph_name,
+                    left: 'center',
+                    top: 10,
+                    textStyle: { fontSize: 14, fontWeight: 'bold' }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: (params) => {
+                        const data = params[0];
+                        const taskData = tasks[data.dataIndex];
+                        return `${data.name}<br/>Start: ${data.axisValue}<br/>Duration: ${taskData.duration} days`;
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: xAxisData,
+                    axisLabel: {
+                        rotate: 45,
+                        fontSize: 10,
+                        interval: 0,
+                        formatter: (value) => {
+                            return new Date(value).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric'
+                            });
+                        }
+                    }
+                },
+                yAxis: {
+                    type: 'category',
+                    data: tasks.map(t => t.name),
+                    axisLabel: {
+                        fontSize: 10,
+                        interval: 0
+                    }
+                },
+                grid: {
+                    left: 150,
+                    right: 20,
+                    top: 50,
+                    bottom: 80,
+                    containLabel: true
+                },
+                series: [{
+                    name: 'Gantt',
+                    type: 'custom',
+                    renderItem: (params, api) => {
+                        const categoryIndex = api.value(0);
+                        const start = api.coord([api.value(1), categoryIndex]);
+                        const end = api.coord([api.value(2), categoryIndex]);
+                        const height = api.size([0, 1])[1] * 0.6;
+
+                        return {
+                            type: 'rect',
+                            shape: {
+                                x: start[0],
+                                y: start[1] - height / 2,
+                                width: Math.max(end[0] - start[0], 20), // Minimum width of 20px
+                                height: height
+                            },
+                            style: {
+                                fill: '#1976d2',
+                                stroke: '#1565c0',
+                                lineWidth: 1
+                            }
+                        };
+                    },
+                    data: ganttData
+                }]
+            };
+        }
+
         return {
-            title: { text: name },
+            title: { text: graph.graph_name },
             xAxis: { type: 'category', data: data.map((d, i) => d.date || `Item ${i + 1}`) },
             yAxis: { type: 'value' },
             series: [{
@@ -620,6 +768,21 @@ function PatientGraph({ patient }) {
         );
     }
 
+    // If specificGraph is provided, render only that graph
+    if (specificGraph) {
+        return (
+            <Box sx={{ height: "100%", width: "100%" }}>
+                <ReactECharts
+                    option={buildOption(specificGraph)}
+                    style={{ height: "320px", width: "100%" }}
+                    notMerge={true}
+                    lazyUpdate={true}
+                    theme="cool-med"
+                />
+            </Box>
+        );
+    }
+
     // Debug: Log the data to console
     console.log('PatientGraph - Patient:', patient);
     console.log('PatientGraph - Response:', response);
@@ -631,75 +794,77 @@ function PatientGraph({ patient }) {
             <Box sx={{ flex: 1, overflow: "auto", p: 1 }}>
 
                 {/* KPI header with sparklines - 4 boxes, 25% each */}
-                <Box sx={{ display: 'flex', width: '100%', gap: 1, mb: 3 }}>
-                    {/* Weight Box - 25% */}
-                    <Box sx={{ width: '25%', display: 'flex', flexDirection: 'column' }}>
-                        <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                            <Typography variant="caption" sx={{ display: 'block', mb: 1, textAlign: 'center', fontWeight: 'bold', fontSize: '12px' }}>
+                {showKPI && (
+                    <Box sx={{ display: 'flex', width: '100%', gap: 1, mb: 3 }}>
+                        {/* Weight Box - 25% */}
+                        <Box sx={{ width: '25%', display: 'flex', flexDirection: 'column' }}>
+                            <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                {/* <Typography variant="caption" sx={{ display: 'block', mb: 1, textAlign: 'center', fontWeight: 'bold', fontSize: '12px' }}>
                                 Weight
-                            </Typography>
-                            <Box sx={{ flex: 1, minHeight: '80px' }}>
-                                <ReactECharts
-                                    option={buildSpark('Weight', kpiData.weight, 'lb')}
-                                    style={{ height: '80px', width: '100%' }}
-                                    notMerge={true}
-                                    lazyUpdate={true}
-                                />
-                            </Box>
-                        </Paper>
-                    </Box>
+                            </Typography> */}
+                                <Box sx={{ flex: 1, minHeight: '80px' }}>
+                                    <ReactECharts
+                                        option={buildSpark('Weight', kpiData.weight, 'lb')}
+                                        style={{ height: '80px', width: '100%' }}
+                                        notMerge={true}
+                                        lazyUpdate={true}
+                                    />
+                                </Box>
+                            </Paper>
+                        </Box>
 
-                    {/* BMI Box - 25% */}
-                    <Box sx={{ width: '25%', display: 'flex', flexDirection: 'column' }}>
-                        <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                            <Typography variant="caption" sx={{ display: 'block', mb: 1, textAlign: 'center', fontWeight: 'bold', fontSize: '12px' }}>
+                        {/* BMI Box - 25% */}
+                        <Box sx={{ width: '25%', display: 'flex', flexDirection: 'column' }}>
+                            <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                {/* <Typography variant="caption" sx={{ display: 'block', mb: 1, textAlign: 'center', fontWeight: 'bold', fontSize: '12px' }}>
                                 BMI
-                            </Typography>
-                            <Box sx={{ flex: 1, minHeight: '80px' }}>
-                                <ReactECharts
-                                    option={buildSpark('BMI', kpiData.bmi, '')}
-                                    style={{ height: '80px', width: '100%' }}
-                                    notMerge={true}
-                                    lazyUpdate={true}
-                                />
-                            </Box>
-                        </Paper>
-                    </Box>
+                            </Typography> */}
+                                <Box sx={{ flex: 1, minHeight: '80px' }}>
+                                    <ReactECharts
+                                        option={buildSpark('BMI', kpiData.bmi, '')}
+                                        style={{ height: '80px', width: '100%' }}
+                                        notMerge={true}
+                                        lazyUpdate={true}
+                                    />
+                                </Box>
+                            </Paper>
+                        </Box>
 
-                    {/* SBP Box - 25% */}
-                    <Box sx={{ width: '25%', display: 'flex', flexDirection: 'column' }}>
-                        <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                            <Typography variant="caption" sx={{ display: 'block', mb: 1, textAlign: 'center', fontWeight: 'bold', fontSize: '12px' }}>
+                        {/* SBP Box - 25% */}
+                        <Box sx={{ width: '25%', display: 'flex', flexDirection: 'column' }}>
+                            <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                {/* <Typography variant="caption" sx={{ display: 'block', mb: 1, textAlign: 'center', fontWeight: 'bold', fontSize: '12px' }}>
                                 SBP
-                            </Typography>
-                            <Box sx={{ flex: 1, minHeight: '80px' }}>
-                                <ReactECharts
-                                    option={buildSpark('SBP', kpiData.bp, 'mmHg')}
-                                    style={{ height: '80px', width: '100%' }}
-                                    notMerge={true}
-                                    lazyUpdate={true}
-                                />
-                            </Box>
-                        </Paper>
-                    </Box>
+                            </Typography> */}
+                                <Box sx={{ flex: 1, minHeight: '80px' }}>
+                                    <ReactECharts
+                                        option={buildSpark('SBP', kpiData.bp, 'mmHg')}
+                                        style={{ height: '80px', width: '100%' }}
+                                        notMerge={true}
+                                        lazyUpdate={true}
+                                    />
+                                </Box>
+                            </Paper>
+                        </Box>
 
-                    {/* HR Box - 25% */}
-                    <Box sx={{ width: '25%', display: 'flex', flexDirection: 'column' }}>
-                        <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                            <Typography variant="caption" sx={{ display: 'block', mb: 1, textAlign: 'center', fontWeight: 'bold', fontSize: '12px' }}>
+                        {/* HR Box - 25% */}
+                        <Box sx={{ width: '25%', display: 'flex', flexDirection: 'column' }}>
+                            <Paper elevation={2} sx={{ p: 1.5, borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                {/* <Typography variant="caption" sx={{ display: 'block', mb: 1, textAlign: 'center', fontWeight: 'bold', fontSize: '12px' }}>
                                 HR
-                            </Typography>
-                            <Box sx={{ flex: 1, minHeight: '80px' }}>
-                                <ReactECharts
-                                    option={buildSpark('HR', kpiData.hr, 'bpm')}
-                                    style={{ height: '80px', width: '100%' }}
-                                    notMerge={true}
-                                    lazyUpdate={true}
-                                />
-                            </Box>
-                        </Paper>
+                            </Typography> */}
+                                <Box sx={{ flex: 1, minHeight: '80px' }}>
+                                    <ReactECharts
+                                        option={buildSpark('HR', kpiData.hr, 'bpm')}
+                                        style={{ height: '80px', width: '100%' }}
+                                        notMerge={true}
+                                        lazyUpdate={true}
+                                    />
+                                </Box>
+                            </Paper>
+                        </Box>
                     </Box>
-                </Box>
+                )}
 
                 {/* Main graphs - 2 per row, 50% each with proper spacing */}
                 <Box sx={{ width: "100%", display: "flex", flexDirection: "column", gap: 2 }}>
