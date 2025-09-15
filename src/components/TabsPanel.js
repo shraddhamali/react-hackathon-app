@@ -731,11 +731,6 @@ export default function TabsPanel({ patient }) {
                                         <Typography variant="h6" sx={{ fontWeight: "bold", fontSize: "16px", color: "text.primary" }}>
                                             Medical Timeline
                                         </Typography>
-                                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                            <Typography variant="body2" sx={{ fontWeight: "bold", color: "text.primary" }}>
-                                                September 2020
-                                            </Typography>
-                                        </Box>
                                     </Box>
 
                                     {/* Timeline Content */}
