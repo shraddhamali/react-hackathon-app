@@ -18,9 +18,11 @@ export default function TabsPanel({ patient }) {
     const [trendsData, setTrendsData] = useState([]);
     const [selectedChartType, setSelectedChartType] = useState('all');
     const [patientVitalResponse, setPatientVital] = useState([]);
+    const [labsResponse, setLabsResponse] = useState([]);
+    const [labReportSummary, setLabReportSummary] = useState(null);
 
     // helper function
-    const getTrend = (key: string, value: any) => {
+    const getTrend = (key, value) => {
         if (!value) return "stable";
 
         switch (key) {
@@ -86,6 +88,14 @@ export default function TabsPanel({ patient }) {
 
             if (patientDetail && patientDetail.ai_response && patientDetail.ai_response.patient_vitals) {
                 setPatientVital(patientDetail.ai_response.patient_vitals);
+            }
+
+            if (patientDetail && patientDetail.ai_response && patientDetail.ai_response.labs) {
+                setLabsResponse(patientDetail.ai_response.labs);
+            }
+
+            if (patientDetail && patientDetail.ai_response && patientDetail.ai_response.lab_report_summary) {
+                setLabReportSummary(patientDetail.ai_response.lab_report_summary);
             }
 
         }
@@ -482,6 +492,204 @@ export default function TabsPanel({ patient }) {
                                                         </Typography>
                                                     </Box>
                                                 )) || <Typography>No recent encounters found</Typography>}
+                                            </Box>
+                                        </Paper>
+                                    </Box>
+
+                                    {/* Lab Report and Lab Report Summary Row */}
+                                    <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+                                        {/* Lab Report (left) */}
+                                        <Paper sx={{
+                                            p: 2,
+                                            borderRadius: 3,
+                                            flex: 1,
+                                            borderTop: "4px solid #1E88E5",
+                                            backgroundColor: "background.paper"
+                                        }}>
+                                            <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1, color: "text.primary" }}>
+                                                Lab Report
+                                            </Typography>
+
+                                            <Box sx={{
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                gap: 0.8,
+                                                maxHeight: "320px",
+                                                overflowY: "auto",
+                                                overflowX: "hidden",
+                                                pr: 1,
+                                                "&::-webkit-scrollbar": { width: "6px" },
+                                                "&::-webkit-scrollbar-track": { background: "#F1F5F9", borderRadius: "3px" },
+                                                "&::-webkit-scrollbar-thumb": { background: "#CBD5E1", borderRadius: "3px", "&:hover": { background: "#94A3B8" } }
+                                            }}>
+                                                {(labsResponse?.length > 0 ? labsResponse : []).map((test, index) => (
+                                                    <Box key={index} sx={{
+                                                        p: 1.5,
+                                                        background: "linear-gradient(135deg,rgb(204, 229, 255) 0%,rgb(255, 255, 255) 100%)",
+                                                        borderRadius: 2,
+                                                        border: "1px solid #DBEAFE",
+                                                        borderLeft: "3px solid #1E88E5",
+                                                        boxShadow: "0 1px 3px rgba(0,0,0,0.04)"
+                                                    }}>
+                                                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 0.8 }}>
+                                                            <Typography variant="body2" sx={{ fontSize: "13px", fontWeight: "bold", color: "#0F172A" }}>
+                                                                {test.test_name}
+                                                            </Typography>
+                                                            <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap" }}>
+                                                                {test.loinc && (
+                                                                    <Chip label={`LOINC: ${test.loinc}`} size="small" variant="outlined" />
+                                                                )}
+                                                                {test.unit && (
+                                                                    <Chip label={`Unit: ${test.unit}`} size="small" color="primary" variant="outlined" />
+                                                                )}
+                                                                {test.ref_range && (
+                                                                    <Chip
+                                                                        label={
+                                                                            typeof test.ref_range.low !== "undefined"
+                                                                                ? `Ref: ${test.ref_range.low} - ${test.ref_range.high}`
+                                                                                : `Ref: < ${test.ref_range.high}`
+                                                                        }
+                                                                        size="small"
+                                                                        color="success"
+                                                                        variant="outlined"
+                                                                    />
+                                                                )}
+                                                            </Box>
+                                                        </Box>
+
+                                                        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.4 }}>
+                                                            {(test.data || []).map((d, i) => (
+                                                                <Box key={i} sx={{ display: "flex", justifyContent: "space-between" }}>
+                                                                    <Typography variant="body2" sx={{ fontSize: "12px", color: "#475569" }}>
+                                                                        {d.date}
+                                                                    </Typography>
+                                                                    <Typography variant="body2" sx={{ fontSize: "12px", color: "#0F172A", fontWeight: 600 }}>
+                                                                        {d.value}{test.unit ? ` ${test.unit}` : ""}
+                                                                    </Typography>
+                                                                </Box>
+                                                            ))}
+                                                        </Box>
+                                                    </Box>
+                                                ))}
+
+                                                {(!labsResponse || labsResponse.length === 0) && (
+                                                    <Typography color="text.secondary">No labs found</Typography>
+                                                )}
+                                            </Box>
+                                        </Paper>
+
+                                        {/* Lab Report Summary (right) */}
+                                        <Paper sx={{
+                                            p: 2,
+                                            borderRadius: 3,
+                                            flex: 1,
+                                            borderTop: "4px solid #EF4444",
+                                            backgroundColor: "background.paper"
+                                        }}>
+                                            <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1, color: "text.primary" }}>
+                                                Lab Report Summary
+                                            </Typography>
+
+                                            <Box sx={{ display: "flex", flexDirection: "column", gap: 1.2, maxHeight: "320px", overflowY: "auto", pr: 1,
+                                                "&::-webkit-scrollbar": { width: "6px" },
+                                                "&::-webkit-scrollbar-track": { background: "#F1F5F9", borderRadius: "3px" },
+                                                "&::-webkit-scrollbar-thumb": { background: "#CBD5E1", borderRadius: "3px", "&:hover": { background: "#94A3B8" } }
+                                            }}>
+                                                {/* Abnormal Results */}
+                                                <Box>
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: "bold", color: "#B91C1C", mb: 0.5 }}>
+                                                        Abnormal Results
+                                                    </Typography>
+                                                    <Box sx={{ display: "flex", flexDirection: "column", gap: 0.6 }}>
+                                                        {(labReportSummary?.abnormal_results || []).map((r, i) => (
+                                                            <Box key={i} sx={{
+                                                                p: 1,
+                                                                background: "linear-gradient(135deg,rgb(254, 226, 226) 0%,rgb(255, 255, 255) 100%)",
+                                                                border: "1px solid #FEE2E2",
+                                                                borderLeft: "3px solid #EF4444",
+                                                                borderRadius: 2
+                                                            }}>
+                                                                <Typography variant="body2" sx={{ fontSize: "13px", fontWeight: "bold", color: "#0F172A" }}>
+                                                                    {r.test_name} — {r.value}{r.unit ? ` ${r.unit}` : ""}
+                                                                </Typography>
+                                                                <Typography variant="body2" sx={{ fontSize: "12px", color: "#475569" }}>
+                                                                    Date: {r.date} • Ref: {r.ref_range}
+                                                                </Typography>
+                                                                {r.interpretation && (
+                                                                    <Typography variant="body2" sx={{ fontSize: "12px", color: "#374151" }}>
+                                                                        {r.interpretation}
+                                                                    </Typography>
+                                                                )}
+                                                            </Box>
+                                                        ))}
+                                                        {(!labReportSummary?.abnormal_results || labReportSummary.abnormal_results.length === 0) && (
+                                                            <Typography color="text.secondary" sx={{ fontSize: "12px" }}>None</Typography>
+                                                        )}
+                                                    </Box>
+                                                </Box>
+
+                                                {/* Critical Alerts */}
+                                                <Box>
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: "bold", color: "#B91C1C", mb: 0.5 }}>
+                                                        Critical Alerts
+                                                    </Typography>
+                                                    <Box sx={{ display: "flex", flexDirection: "column", gap: 0.6 }}>
+                                                        {(labReportSummary?.critical_alerts || []).map((r, i) => (
+                                                            <Box key={i} sx={{
+                                                                p: 1,
+                                                                background: "linear-gradient(135deg,rgb(254, 215, 170) 0%,rgb(255, 255, 255) 100%)",
+                                                                border: "1px solid #FED7AA",
+                                                                borderLeft: "3px solid #F59E0B",
+                                                                borderRadius: 2
+                                                            }}>
+                                                                <Typography variant="body2" sx={{ fontSize: "13px", fontWeight: "bold", color: "#0F172A" }}>
+                                                                    {r.test_name ? r.test_name : "Alert"}
+                                                                </Typography>
+                                                                {(r.value || r.unit || r.date || r.ref_range) && (
+                                                                    <Typography variant="body2" sx={{ fontSize: "12px", color: "#475569" }}>
+                                                                        {r.value ? `Value: ${r.value}${r.unit ? ` ${r.unit}` : ""}` : ""} {r.date ? `• Date: ${r.date}` : ""} {r.ref_range ? `• Ref: ${r.ref_range}` : ""}
+                                                                    </Typography>
+                                                                )}
+                                                                {r.interpretation && (
+                                                                    <Typography variant="body2" sx={{ fontSize: "12px", color: "#374151" }}>
+                                                                        {r.interpretation}
+                                                                    </Typography>
+                                                                )}
+                                                            </Box>
+                                                        ))}
+                                                        {(!labReportSummary?.critical_alerts || labReportSummary.critical_alerts.length === 0) && (
+                                                            <Typography color="text.secondary" sx={{ fontSize: "12px" }}>None</Typography>
+                                                        )}
+                                                    </Box>
+                                                </Box>
+
+                                                {/* Last Normal Values */}
+                                                <Box>
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: "bold", color: "text.primary", mb: 0.5 }}>
+                                                        Last Normal Values
+                                                    </Typography>
+                                                    <Box sx={{ display: "flex", flexDirection: "column", gap: 0.6 }}>
+                                                        {(labReportSummary?.last_normal_values || []).map((r, i) => (
+                                                            <Box key={i} sx={{
+                                                                p: 1,
+                                                                background: "linear-gradient(135deg,rgb(220, 252, 231) 0%,rgb(255, 255, 255) 100%)",
+                                                                border: "1px solid #DCFCE7",
+                                                                borderLeft: "3px solid #22C55E",
+                                                                borderRadius: 2
+                                                            }}>
+                                                                <Typography variant="body2" sx={{ fontSize: "13px", fontWeight: "bold", color: "#0F172A" }}>
+                                                                    {r.test_name} — {r.value}{r.unit ? ` ${r.unit}` : ""}
+                                                                </Typography>
+                                                                <Typography variant="body2" sx={{ fontSize: "12px", color: "#475569" }}>
+                                                                    Date: {r.date} • Ref: {r.ref_range}
+                                                                </Typography>
+                                                            </Box>
+                                                        ))}
+                                                        {(!labReportSummary?.last_normal_values || labReportSummary.last_normal_values.length === 0) && (
+                                                            <Typography color="text.secondary" sx={{ fontSize: "12px" }}>None</Typography>
+                                                        )}
+                                                    </Box>
+                                                </Box>
                                             </Box>
                                         </Paper>
                                     </Box>
