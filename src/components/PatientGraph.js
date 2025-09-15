@@ -154,7 +154,7 @@ function PatientGraph({ patient, specificGraph, showKPI = true }) {
                 },
                 animationDuration: enh.animationDuration,
                 animationEasing: enh.animationEasing,
-                series: [{ name: 'Weight', type: 'line', data: data.map((d) => d.weight_lb), ...lineSeriesEnhancements }]
+                series: [{ name: 'Weight', type: 'line', data: data.map((d) => parseFloat(d.value) || 0), ...lineSeriesEnhancements }]
             };
         }
 
@@ -360,7 +360,7 @@ function PatientGraph({ patient, specificGraph, showKPI = true }) {
                     trigger: 'axis',
                     formatter: (params) => {
                         const p = params[0];
-                        return `${p.axisValue}<br/>${categoryValueToLabel(p.value)} (code ${p.value})`;
+                        return `${p.axisValue}<br/>${p.value}`;
                     }
                 },
                 xAxis: {
@@ -373,11 +373,9 @@ function PatientGraph({ patient, specificGraph, showKPI = true }) {
                     }
                 },
                 yAxis: {
-                    type: 'value',
-                    min: 0,
-                    max: 3,
+                    type: 'category',
+                    data: ['Normal', 'Stage 1', 'Stage 2', 'Stage 3'],
                     axisLabel: {
-                        formatter: (v) => categoryValueToLabel(v),
                         fontSize: 10
                     }
                 },
@@ -393,13 +391,12 @@ function PatientGraph({ patient, specificGraph, showKPI = true }) {
                     containLabel: true
                 },
                 series: [
-                    { name: 'Category', type: 'bar', data: data.map((d) => categoryToValue(d.category)), emphasis: { focus: 'series' } }
-                ],
-                visualMap: { show: false, min: 0, max: 3, inRange: { color: ['#2a9d8f', '#29b6f6', '#7c4dff'] } }
+                    { name: 'Category', type: 'bar', data: data.map((d) => d.scale), emphasis: { focus: 'series' } }
+                ]
             };
         }
 
-        if (type === 'multiline' || name.includes('Lab Values Trend')) {
+        if (type === 'multi-line' || name.includes('Blood Pressure by Encounter')) {
             const x = data.map((d) => d.date);
             return {
                 title: {
@@ -410,7 +407,7 @@ function PatientGraph({ patient, specificGraph, showKPI = true }) {
                 },
                 tooltip: { trigger: 'axis' },
                 legend: {
-                    data: ['Glucose', 'Cholesterol', 'Creatinine'],
+                    data: ['Systolic', 'Diastolic'],
                     top: 35,
                     left: 'center',
                     itemGap: 20
@@ -426,7 +423,7 @@ function PatientGraph({ patient, specificGraph, showKPI = true }) {
                 },
                 yAxis: {
                     type: 'value',
-                    name: 'mg/dL',
+                    name: 'mmHg',
                     nameLocation: 'middle',
                     nameGap: 30,
                     nameTextStyle: { fontSize: 12 }
@@ -443,9 +440,8 @@ function PatientGraph({ patient, specificGraph, showKPI = true }) {
                     containLabel: true
                 },
                 series: [
-                    { name: 'Glucose', type: 'line', data: data.map((d) => d.glucose), ...lineSeriesEnhancements },
-                    { name: 'Cholesterol', type: 'line', data: data.map((d) => d.cholesterol), ...lineSeriesEnhancements },
-                    { name: 'Creatinine', type: 'line', data: data.map((d) => d.creatinine), ...lineSeriesEnhancements }
+                    { name: 'Systolic', type: 'line', data: data.map((d) => parseFloat(d.line_1) || 0), ...lineSeriesEnhancements },
+                    { name: 'Diastolic', type: 'line', data: data.map((d) => parseFloat(d.line_2) || 0), ...lineSeriesEnhancements }
                 ]
             };
         }
@@ -549,6 +545,104 @@ function PatientGraph({ patient, specificGraph, showKPI = true }) {
                     symbolSize: 8,
                     itemStyle: { color: '#1976d2' },
                     emphasis: { focus: 'series' }
+                }]
+            };
+        }
+
+        if (type === 'timeline') {
+            // Process timeline data - simplified approach
+            const timelineData = data.map((d, index) => {
+                return {
+                    name: d.event,
+                    date: d.date,
+                    index: index
+                };
+            });
+
+            // Create simple timeline chart data
+            const timelineChartData = timelineData.map((event, index) => {
+                return {
+                    name: event.name,
+                    value: 1, // All bars have same height
+                    itemStyle: {
+                        color: '#1976d2',
+                        borderColor: '#1565c0',
+                        borderWidth: 1
+                    }
+                };
+            });
+
+            return {
+                title: {
+                    text: graph.graph_name,
+                    left: 'center',
+                    top: 10,
+                    textStyle: { fontSize: 14, fontWeight: 'bold' }
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: (params) => {
+                        const event = timelineData[params.dataIndex];
+                        return `${event.name}<br/>Date: ${event.date}`;
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: timelineData.map((event, index) => event.name),
+                    axisLabel: {
+                        rotate: 45,
+                        fontSize: 10,
+                        interval: 0
+                    },
+                    axisLine: {
+                        show: true
+                    },
+                    axisTick: {
+                        show: true
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    min: 0,
+                    max: 2,
+                    axisLabel: {
+                        show: false
+                    },
+                    axisLine: {
+                        show: false
+                    },
+                    axisTick: {
+                        show: false
+                    },
+                    splitLine: {
+                        show: false
+                    }
+                },
+                grid: {
+                    left: 50,
+                    right: 50,
+                    top: 80,
+                    bottom: 100,
+                    containLabel: true
+                },
+                series: [{
+                    name: 'Timeline Events',
+                    type: 'bar',
+                    data: timelineChartData,
+                    barWidth: '60%',
+                    barGap: '10%',
+                    itemStyle: {
+                        color: '#1976d2',
+                        borderColor: '#1565c0',
+                        borderWidth: 1
+                    },
+                    emphasis: {
+                        itemStyle: {
+                            color: '#1565c0',
+                            borderColor: '#0d47a1',
+                            borderWidth: 2
+                        }
+                    }
                 }]
             };
         }
