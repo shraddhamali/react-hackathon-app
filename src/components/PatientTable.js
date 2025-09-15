@@ -145,7 +145,7 @@ export default function PatientTable({ onRowClick }) {
                             >
                                 <TableCell>{patient.patient_id}</TableCell>
                                 <TableCell>{`${patient.name.first} ${patient.name.last}`}</TableCell>
-                                <TableCell>{new Date(patient.dob).toLocaleDateString("en-US")}</TableCell>
+                                <TableCell>{patient.dob ? new Date(patient.dob).toLocaleDateString("en-US") : ""}</TableCell>
                                 <TableCell>{patient.sex}</TableCell>
                                 <TableCell>{patient.age}</TableCell>
                                 <TableCell>
@@ -157,7 +157,17 @@ export default function PatientTable({ onRowClick }) {
                                         </>
                                     )}
                                 </TableCell>
-                                <TableCell>{`${patient.address.line1}, ${patient.address.city}, ${patient.address.state} ${patient.address.zip}`}</TableCell>
+                                <TableCell>
+                                  {[
+                                    patient.address?.line1,
+                                    patient.address?.city,
+                                    patient.address?.state,
+                                    patient.address?.zip,
+                                  ]
+                                    .filter(Boolean) // remove empty/undefined/null
+                                    .join(", ")}
+                                </TableCell>
+
                             </TableRow>
                         ))}
                     </TableBody>

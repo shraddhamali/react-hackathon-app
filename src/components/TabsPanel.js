@@ -174,7 +174,8 @@ export default function TabsPanel({ patient }) {
                                         <b>Name:</b> {patient.name.first} {patient.name.last}
                                     </Typography>
                                     <Typography variant="body1" sx={{ fontSize: "14px", fontWeight: "bold" }}>
-                                        <b>DOB:</b> {new Date(patient.dob).toLocaleDateString("en-US")}
+                                      <b>DOB:</b>{" "}
+                                      {patient.dob ? new Date(patient.dob).toLocaleDateString("en-US") : ""}
                                     </Typography>
                                     <Typography variant="body1" sx={{ fontSize: "14px", fontWeight: "bold" }}>
                                         <b>Sex:</b> {patient.sex}
@@ -187,8 +188,16 @@ export default function TabsPanel({ patient }) {
                                         {patient.contact.email && ` | ${patient.contact.email}`}
                                     </Typography>
                                     <Typography variant="body1" sx={{ fontSize: "14px", fontWeight: "bold" }}>
-                                        <b>Address:</b> {patient.address.line1}, {patient.address.city}, {patient.address.state} {patient.address.zip}
-                                    </Typography>
+                                     <b>Address:</b>{" "}
+                                     {[
+                                       patient.address?.line1,
+                                       patient.address?.city,
+                                       patient.address?.state,
+                                       patient.address?.zip,
+                                     ]
+                                       .filter(Boolean) // removes empty/null/undefined
+                                       .join(", ")}
+                                   </Typography>
                                 </Paper>
                             </Box>
 
