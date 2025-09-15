@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Paper,
@@ -9,18 +9,78 @@ import {
   ListItem,
   Fab,
   Tooltip,
+  Zoom,
+  Fade,
+  Slide,
+  Grow,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { keyframes } from "@mui/system";
+
+// Keyframe animations
+const bounce = keyframes`
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0,0,0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -8px, 0);
+  }
+  70% {
+    transform: translate3d(0, -4px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+`;
+
+const pulse = keyframes`
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+`;
+
+const typing = keyframes`
+  0%, 60%, 100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-10px);
+  }
+`;
+
+const fadeInUp = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
 
 export default function Chatbot({ patientId }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { sender: "bot", text: "Hi 👋, I’m your assistant. How can I help you?" },
+    { sender: "bot", text: "Hi 👋, I'm your assistant. How can I help you?" },
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -60,183 +120,288 @@ export default function Chatbot({ patientId }) {
   return (
     <>
       {/* Floating Chat Icon */}
-      {!isOpen && (
-        <Tooltip title="Chat Bot" placement="left">
+      <Zoom in={!isOpen} timeout={300}>
+        <Tooltip title="Chat with AI Assistant" placement="left">
           <Fab
             onClick={() => setIsOpen(true)}
             sx={{
               position: "fixed",
-              bottom: 20,
-              right: 20,
-              bgcolor: "white",
-              "&:hover": { bgcolor: "#f0f0f0" },
+              bottom: 24,
+              right: 24,
+              width: 64,
+              height: 64,
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              color: "white",
+              boxShadow: "0 8px 32px rgba(102, 126, 234, 0.4)",
+              animation: `${pulse} 2s infinite`,
+              zIndex: 9999, // Highest z-index for chatbot FAB
+              "&:hover": {
+                background: "linear-gradient(135deg, #764ba2 0%, #667eea 100%)",
+                boxShadow: "0 12px 40px rgba(102, 126, 234, 0.6)",
+                animation: `${bounce} 1s`,
+              },
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
             }}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 512 512"
-              width="42"
-              height="42"
-              role="img"
-              aria-label="Chatbot icon"
+              viewBox="0 0 24 24"
+              width="32"
+              height="32"
+              fill="currentColor"
             >
-              <title>Chatbot icon</title>
-              <path
-                d="M256 56
-                C149 56 64 141 64 248
-                c0 71 40 132 100 166
-                v86l78-52
-                c14 2 28 4 42 4
-                c107 0 192-85 192-192
-                S363 56 256 56z"
-                fill="#19A7D1"
-              />
-              <rect x="118" y="162" width="276" height="148" rx="74" ry="74" fill="#ffffff" />
-              <circle cx="110" cy="236" r="18" fill="#ffffff" />
-              <circle cx="402" cy="236" r="18" fill="#ffffff" />
-              <rect x="174" y="198" width="164" height="82" rx="40" ry="40" fill="#444446" />
-              <circle cx="230" cy="238" r="12" fill="#1FB6D9" />
-              <circle cx="306" cy="238" r="12" fill="#1FB6D9" />
-              <rect x="248" y="140" width="16" height="28" rx="4" ry="4" fill="#EDEDED" />
-              <circle cx="256" cy="132" r="12" fill="#EDEDED" />
+              <path d="M12 2C6.48 2 2 6.48 2 12c0 1.54.36 3.04.97 4.37L1 23l6.63-1.97C9.96 21.64 11.46 22 13 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.3 0-2.58-.22-3.77-.64L7 20l-1.36-.36C4.22 18.58 4 17.3 4 16c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8z" />
+              <circle cx="9" cy="12" r="1" />
+              <circle cx="12" cy="12" r="1" />
+              <circle cx="15" cy="12" r="1" />
             </svg>
           </Fab>
         </Tooltip>
-      )}
+      </Zoom>
 
       {/* Chat Window */}
-      {isOpen && (
+      <Slide direction="up" in={isOpen} timeout={400}>
         <Paper
           sx={{
             position: "fixed",
-            bottom: 80,
-            right: 20,
-            width: 320,
-            height: 400,
+            bottom: 100,
+            right: 24,
+            width: 380,
+            height: 500,
             display: "flex",
             flexDirection: "column",
-            borderRadius: 2,
-            boxShadow: 4,
+            borderRadius: 3,
+            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
+            overflow: "hidden",
+            backdropFilter: "blur(10px)",
+            border: "1px solid rgba(255, 255, 255, 0.2)",
+            zIndex: 9998, // High z-index for chat window, just below FAB
           }}
         >
           {/* Header */}
           <Box
             sx={{
-              p: 1.5,
-              bgcolor: "primary.main",
+              px: 2,
+              py: 1,
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
               color: "white",
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              borderTopLeftRadius: 8,
-              borderTopRightRadius: 8,
+              position: "relative",
+              "&::after": {
+                content: '""',
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: "1px",
+                background: "rgba(255, 255, 255, 0.2)",
+              },
             }}
           >
-            <Typography variant="subtitle1">Assistant</Typography>
-            <IconButton size="small" onClick={() => setIsOpen(false)} sx={{ color: "white" }}>
-              ✖
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box
+                sx={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: "50%",
+                  bgcolor: "#4ade80",
+                  animation: `${pulse} 2s infinite`,
+                }}
+              />
+              <Typography variant="h6" sx={{ fontWeight: 600, fontSize: "1.1rem" }}>
+                AI Assistant
+              </Typography>
+            </Box>
+            <IconButton
+              size="small"
+              onClick={() => setIsOpen(false)}
+              sx={{
+                color: "white",
+                "&:hover": {
+                  bgcolor: "rgba(255, 255, 255, 0.1)",
+                  transform: "rotate(90deg)",
+                },
+                transition: "all 0.3s ease",
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+              </svg>
             </IconButton>
           </Box>
 
           {/* Messages */}
-          <Box sx={{ flex: 1, overflowY: "auto", p: 1 }}>
-            <List>
+          <Box
+            sx={{
+              flex: 1,
+              overflowY: "auto",
+              p: 2,
+              background: "linear-gradient(to bottom, #fafafa, #ffffff)",
+              "&::-webkit-scrollbar": {
+                width: "4px",
+              },
+              "&::-webkit-scrollbar-track": {
+                background: "transparent",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                background: "rgba(0,0,0,0.1)",
+                borderRadius: "4px",
+              },
+            }}
+          >
+            <List sx={{ p: 0 }}>
               {messages.map((msg, i) => (
-                <ListItem
+                <Grow
                   key={i}
-                  sx={{
-                    justifyContent: msg.sender === "user" ? "flex-end" : "flex-start",
-                  }}
+                  in={true}
+                  timeout={300 + i * 100}
+                  style={{ transformOrigin: msg.sender === "user" ? "right center" : "left center" }}
                 >
-                  <Box
+                  <ListItem
                     sx={{
-                      p: 1,
-                      borderRadius: 2,
-                      maxWidth: "75%",
-                      bgcolor: msg.sender === "user" ? "#e3f2fd" : "#f5f5f5",
+                      justifyContent: msg.sender === "user" ? "flex-end" : "flex-start",
+                      py: 0.5,
+                      px: 0,
                     }}
                   >
-                    {msg.sender === "bot" ? (
-                      <ReactMarkdown
-                        remarkPlugins={[remarkGfm]}
-                        components={{
-                          p: ({ children }) => (
-                            <Typography variant="body2" sx={{ mb: 1 }}>
-                              {children}
-                            </Typography>
-                          ),
-                          strong: ({ children }) => (
-                            <strong style={{ fontWeight: "bold" }}>{children}</strong>
-                          ),
-                          code: ({ inline, children }) =>
-                            inline ? (
-                              <code
-                                style={{
-                                  background: "#eee",
-                                  padding: "2px 4px",
-                                  borderRadius: "4px",
-                                }}
-                              >
-                                {children}
-                              </code>
-                            ) : (
-                              <pre
-                                style={{
-                                  background: "#272822",
-                                  color: "#f8f8f2",
-                                  padding: "8px",
-                                  borderRadius: "6px",
-                                  overflowX: "auto",
-                                }}
-                              >
-                                <code>{children}</code>
-                              </pre>
-                            ),
+                    <Box
+                      sx={{
+                        p: 1.5,
+                        borderRadius: msg.sender === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
+                        maxWidth: "85%",
+                        background: msg.sender === "user"
+                          ? "rgb(233, 210, 255)"
+                          : "#ffffff",
+                        color: msg.sender === "user" ? "#ffffff !important" : "#2d3748",
+                        boxShadow: msg.sender === "user"
+                          ? "0 4px 12px rgba(102, 126, 234, 0.3)"
+                          : "0 2px 8px rgba(0, 0, 0, 0.1)",
+                        border: msg.sender === "bot" ? "1px solid rgba(0, 0, 0, 0.05)" : "none",
+                        animation: `${fadeInUp} 0.3s ease-out`,
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          lineHeight: 1.5,
+                          fontSize: "0.9rem",
+                          color: "#000000",
+                          fontWeight: 400,
                         }}
                       >
                         {msg.text}
-                      </ReactMarkdown>
-                    ) : (
-                      <Typography variant="body2">{msg.text}</Typography>
-                    )}
-                  </Box>
-                </ListItem>
+                      </Typography>
+                    </Box>
+                  </ListItem>
+                </Grow>
               ))}
               {isTyping && (
-                <ListItem sx={{ justifyContent: "flex-start" }}>
-                  <Box
-                    sx={{
-                      p: 1,
-                      borderRadius: 2,
-                      maxWidth: "75%",
-                      bgcolor: "#f5f5f5",
-                      fontStyle: "italic",
-                    }}
-                  >
-                    <Typography variant="body2">Assistant is typing...</Typography>
-                  </Box>
-                </ListItem>
+                <Fade in={isTyping}>
+                  <ListItem sx={{ justifyContent: "flex-start", py: 0.5, px: 0 }}>
+                    <Box
+                      sx={{
+                        p: 1.5,
+                        borderRadius: "18px 18px 18px 4px",
+                        maxWidth: "85%",
+                        bgcolor: "#ffffff",
+                        border: "1px solid rgba(0, 0, 0, 0.05)",
+                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
+                      <Box sx={{ display: "flex", gap: 0.5 }}>
+                        {[0, 1, 2].map((dot) => (
+                          <Box
+                            key={dot}
+                            sx={{
+                              width: 6,
+                              height: 6,
+                              borderRadius: "50%",
+                              bgcolor: "#667eea",
+                              animation: `${typing} 1.4s infinite ${dot * 0.2}s`,
+                            }}
+                          />
+                        ))}
+                      </Box>
+                      <Typography variant="body2" sx={{ color: "#6b7280", fontSize: "0.85rem" }}>
+                        AI is thinking...
+                      </Typography>
+                    </Box>
+                  </ListItem>
+                </Fade>
               )}
+              <div ref={messagesEndRef} />
             </List>
           </Box>
 
           {/* Input */}
-          <Box sx={{ p: 1, display: "flex", borderTop: "1px solid #ddd" }}>
+          <Box
+            sx={{
+              p: 2,
+              display: "flex",
+              gap: 1,
+              borderTop: "1px solid rgba(0, 0, 0, 0.08)",
+              bgcolor: "rgba(255, 255, 255, 0.9)",
+              backdropFilter: "blur(10px)",
+            }}
+          >
             <TextField
               size="small"
               variant="outlined"
               fullWidth
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              placeholder="Type a message..."
+              onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
+              placeholder="Type your message..."
+              disabled={isTyping}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 3,
+                  bgcolor: "white",
+                  "& fieldset": {
+                    borderColor: "#000000",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#667eea",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#667eea",
+                    borderWidth: "2px",
+                  },
+                },
+                "& .MuiInputBase-input": {
+                  fontSize: "0.9rem",
+                },
+              }}
             />
-            <IconButton onClick={handleSend} color="primary">
-              <SendIcon />
+            <IconButton
+              onClick={handleSend}
+              disabled={!input.trim() || isTyping}
+              sx={{
+                background: input.trim() ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" : "#f5f5f5",
+                color: input.trim() ? "white" : "#9ca3af",
+                width: 40,
+                height: 40,
+                "&:hover": {
+                  background: input.trim() ? "linear-gradient(135deg, #764ba2 0%, #667eea 100%)" : "#e5e7eb",
+                  transform: "scale(1.05)",
+                },
+                "&:disabled": {
+                  background: "#f5f5f5",
+                  color: "#9ca3af",
+                },
+                transition: "all 0.2s ease",
+              }}
+            >
+              <SendIcon sx={{ fontSize: "1.1rem" }} />
             </IconButton>
           </Box>
         </Paper>
-      )}
+      </Slide>
     </>
   );
 }

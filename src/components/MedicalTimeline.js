@@ -140,7 +140,7 @@ export default function MedicalTimeline({ patientId }) {
                                             display: "flex",
                                             alignItems: "center",
                                             justifyContent: "center",
-                                            zIndex: 2,
+                                            zIndex: 10, // Lower z-index to prevent overlap with chatbot
                                             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
                                         }}
                                     >
