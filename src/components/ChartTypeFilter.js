@@ -21,9 +21,15 @@ const chartTypes = [
 
 export default function ChartTypeFilter({ selectedType, onTypeChange, graphCounts }) {
     return (
-        <Paper elevation={2} sx={{ p: 2, mb: 3, borderRadius: 2 }}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#2c3e50' }}>
-                📊 Filter by Chart Type
+        <Paper sx={{
+            p: 2,
+            mb: 3,
+            borderRadius: 3,
+            borderTop: "4px solid #1E88E5",
+            backgroundColor: "background.paper"
+        }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: 'text.primary' }}>
+                Filter by Chart Type
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                 {chartTypes.map((type) => (

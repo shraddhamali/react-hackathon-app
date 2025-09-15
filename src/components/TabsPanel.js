@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Box, Divider, Paper, Tab, Tabs, Typography, Grid } from "@mui/material";
+import { Box, Divider, Paper, Tab, Tabs, Typography, Grid, Chip } from "@mui/material";
 import MedicalTimeline from "./MedicalTimeline";
 import PatientGraph from "./PatientGraph";
 import Chatbot from "./chatbot";
+import IconRail from "./ui/IconRail";
+import KpiCard from "./ui/KpiCard";
+import PatientProfileCard from "./ui/PatientProfileCard";
+import ChartTypeFilter from "./ChartTypeFilter";
 
 export default function TabsPanel({ patient }) {
     const [tabValue, setTabValue] = React.useState("summary");
@@ -12,6 +16,7 @@ export default function TabsPanel({ patient }) {
 
     const [healthSignalResponse, setHealthSignal] = useState([]);
     const [trendsData, setTrendsData] = useState([]);
+    const [selectedChartType, setSelectedChartType] = useState('all');
 
 
     useEffect(() => {
@@ -45,84 +50,12 @@ export default function TabsPanel({ patient }) {
 
 
     return (
-        <Box sx={{ display: "flex", height: "100vh", background: "white" }}>
-            {/* Left Vertical Tabs */}
-            <Box
-                sx={{
-                    width: 240,
-                    bgcolor: "white",
-                    borderRight: 1,
-                    borderColor: "divider",
-                    display: "flex",
-                    flexDirection: "column",
-                }}
-            >
-                {/* Header with patient info and logout */}
-                <Box sx={{ p: 2, borderBottom: 1, borderColor: "divider" }}>
-                    <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1 }}>
-                        {patient.name.first} {patient.name.last}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                        MRN: {patient.patient_id}
-                    </Typography>
-                </Box>
-
-                {/* Main Navigation Tabs */}
-                <Tabs
-                    orientation="vertical"
-                    value={tabValue}
-                    onChange={handleTabChange}
-                    sx={{
-                        flex: 1,
-                        "& .MuiTab-root": {
-                            transition: "all 0.3s ease-in-out",
-                            "&.Mui-selected": {
-                                backgroundColor: "#e3f2fd",
-                                color: "#1565c0",
-                                fontWeight: "bold",
-                                transform: "translateX(4px)",
-                                boxShadow: "0 2px 8px rgba(21, 101, 192, 0.2)"
-                            },
-                            "&:hover": {
-                                backgroundColor: "#f5f5f5",
-                                transform: "translateX(2px)"
-                            }
-                        }
-                    }}
-                >
-                    <Tab
-                        value="summary"
-                        label="Patient Summary"
-                        sx={{
-                            textAlign: "left",
-                            alignItems: "flex-start",
-                            px: 2,
-                            py: 1.5
-                        }}
-                    />
-                    <Tab
-                        value="trends"
-                        label="Trends"
-                        sx={{
-                            textAlign: "left",
-                            alignItems: "flex-start",
-                            px: 2,
-                            py: 1.5
-                        }}
-                    />
-                    <Tab
-                        value="signals"
-                        label="Health Signals"
-                        sx={{
-                            textAlign: "left",
-                            alignItems: "flex-start",
-                            px: 2,
-                            py: 1.5
-                        }}
-                    />
-                </Tabs>
-
-            </Box>
+        <Box sx={{ display: "flex", height: "100vh", background: "transparent" }}>
+            {/* Left Icon Rail */}
+            <IconRail
+                activeTab={tabValue}
+                onTabChange={(newTab) => setTabValue(newTab)}
+            />
 
             {/* Main content area */}
             <Box
@@ -134,324 +67,425 @@ export default function TabsPanel({ patient }) {
                     overflowY: "auto",
                     scrollBehavior: "smooth",
                     transition: "all 0.3s ease-in-out",
-                    backgroundColor: "white"
+                    backgroundColor: "white",
+                    width: "100%",
+                    minWidth: 0  // Allow shrinking
                 }}
             >
                 {tabValue === "summary" && (
                     <Box sx={{
                         display: "flex",
-                        gap: 2,
+                        flexDirection: "column",
+                        gap: 3,
                         height: "100%",
-                        minHeight: "100vh"
+                        minHeight: "100vh",
+                        width: "100%"
                     }}>
-                        {/* Left side - Patient Data and Summary */}
-                        <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2, minHeight: "100%" }}>
-                            {/* Overview Section */}
-                            <Box sx={{ mb: 2 }}>
-                                <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1, color: "#2c3e50" }}>
-                                    Patient Overview
-                                </Typography>
-                                <Typography variant="body1" sx={{ color: "#666", fontSize: "16px" }}>
-                                    Comprehensive view of patient information, medical history, and current health
-                                    status.
-                                </Typography>
+                        {/* Overview Section */}
+                        <Box sx={{ mb: 1 }}>
+                            <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1, color: "text.primary" }}>
+                                Patient Overview
+                            </Typography>
+                            <Typography variant="body1" sx={{ color: "text.secondary", fontSize: "16px" }}>
+                                Comprehensive view of patient information, medical history, and current health status.
+                            </Typography>
+                        </Box>
+
+                        {/* KPI Tiles Row */}
+                        <Box sx={{
+                            display: "flex",
+                            gap: 3,
+                            mb: 3,
+                            width: "100%",
+                            '& > *': {
+                                flex: 1,
+                                minWidth: 0, // Allow cards to shrink
+                            },
+                            '@media (max-width: 1200px)': {
+                                flexWrap: "wrap",
+                                '& > *': {
+                                    flex: '1 1 calc(50% - 12px)',
+                                    minWidth: 200,
+                                },
+                            },
+                            '@media (max-width: 768px)': {
+                                '& > *': {
+                                    flex: '1 1 100%',
+                                },
+                            },
+                        }}>
+                            <KpiCard
+                                title="Heartbeat"
+                                value="85"
+                                unit="bpm"
+                                trend="up"
+                                variant="success"
+                            />
+                            <KpiCard
+                                title="Blood Pressure"
+                                value="100"
+                                unit="80 mmHg"
+                                trend="stable"
+                                variant="primary"
+                            />
+                            <KpiCard
+                                title="Haemoglobin"
+                                value="17.5"
+                                unit="g/dL"
+                                trend="down"
+                                variant="warning"
+                            />
+                            <KpiCard
+                                title="Sugar Levels"
+                                value="100"
+                                unit="mg/dL"
+                                trend="stable"
+                                variant="primary"
+                            />
+                        </Box>
+
+                        {/* Main Content Row */}
+                        <Box sx={{
+                            display: "flex",
+                            gap: 3,
+                            flex: 1,
+                        }}>
+                            {/* Left Column - Patient Profile Card */}
+                            <Box sx={{ width: 350 }}>
+                                <PatientProfileCard patient={patient} />
                             </Box>
 
-                            {/* Patient Data in One Line */}
-                            <Box>
-                                <Paper
-                                    sx={{
-                                        p: 2,
-                                        borderRadius: 3,
-                                        boxShadow: 3,
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: 3,
-                                        flexWrap: "wrap",
-                                        background: "#fafafa",
-                                        border: "1px solid #dee2e6"
-                                    }}
-                                >
-                                    <Typography variant="body1" sx={{ fontSize: "14px", fontWeight: "bold" }}>
-                                        <b>MRN:</b> {patient.patient_id}
-                                    </Typography>
-                                    <Typography variant="body1" sx={{ fontSize: "14px", fontWeight: "bold" }}>
-                                        <b>Name:</b> {patient.name.first} {patient.name.last}
-                                    </Typography>
-                                    <Typography variant="body1" sx={{ fontSize: "14px", fontWeight: "bold" }}>
-                                        <b>DOB:</b>{" "}
-                                        {patient.dob ? new Date(patient.dob).toLocaleDateString("en-US") : ""}
-                                    </Typography>
-                                    <Typography variant="body1" sx={{ fontSize: "14px", fontWeight: "bold" }}>
-                                        <b>Sex:</b> {patient.sex}
-                                    </Typography>
-                                    <Typography variant="body1" sx={{ fontSize: "14px", fontWeight: "bold" }}>
-                                        <b>Age:</b> {patient.age}
-                                    </Typography>
-                                    <Typography variant="body1" sx={{ fontSize: "14px", fontWeight: "bold" }}>
-                                        <b>Contact:</b> {patient.contact.phone}
-                                        {patient.contact.email && ` | ${patient.contact.email}`}
-                                    </Typography>
-                                    <Typography variant="body1" sx={{ fontSize: "14px", fontWeight: "bold" }}>
-                                        <b>Address:</b>{" "}
-                                        {[
-                                            patient.address?.line1,
-                                            patient.address?.city,
-                                            patient.address?.state,
-                                            patient.address?.zip,
-                                        ]
-                                            .filter(Boolean) // removes empty/null/undefined
-                                            .join(", ")}
-                                    </Typography>
-                                </Paper>
-                            </Box>
+                            {/* Middle Column - Patient Summary */}
+                            <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
 
-                            {/* Patient Summary Section */}
-                            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                                {/* One Liner */}
-                                <Paper sx={{
-                                    p: 2,
-                                    borderRadius: 3,
-                                    boxShadow: 3,
-                                    background: "linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%)",
-                                    border: "1px solid #a5d6a7"
-                                }}>
-                                    <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1, color: "#2e7d32" }}>
-                                        📋 Patient Summary
-                                    </Typography>
-                                    <Typography variant="body2"
-                                        sx={{ fontSize: "14px", lineHeight: 1.6, color: "#424242" }}>
-                                        {patientSummaryResponse?.one_liner || "No summary available"}
-                                    </Typography>
-                                </Paper>
-
-                                {/* Top Problems and Allergies Row */}
-                                <Box sx={{ display: "flex", gap: 2 }}>
-                                    {/* Top Problems */}
+                                {/* Patient Summary Section */}
+                                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                                    {/* One Liner */}
                                     <Paper sx={{
                                         p: 2,
                                         borderRadius: 3,
-                                        boxShadow: 3,
-                                        flex: 1,
-                                        background: "linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%)",
-                                        border: "1px solid #ef9a9a"
+                                        borderTop: "4px solid #22C55E",
+                                        backgroundColor: "background.paper"
                                     }}>
-                                        <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1, color: "#c62828" }}>
-                                            🚨 Top Problems
+                                        <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1, color: "text.primary" }}>
+                                            Patient Summary
                                         </Typography>
-                                        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-                                            {patientSummaryResponse?.top_problems?.map((problem, index) => (
-                                                <Box key={index} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                                    <Box sx={{
-                                                        width: 8,
-                                                        height: 8,
-                                                        borderRadius: "50%",
-                                                        bgcolor: "#f44336",
-                                                        flexShrink: 0,
-                                                        boxShadow: "0 2px 4px rgba(244, 67, 54, 0.3)"
-                                                    }} />
-                                                    <Typography variant="body2"
-                                                        sx={{ fontSize: "13px", color: "#424242" }}>
-                                                        {problem}
-                                                    </Typography>
-                                                </Box>
-                                            )) || <Typography>No problems found</Typography>}
-                                        </Box>
+                                        <Typography variant="body2"
+                                            sx={{ fontSize: "14px", lineHeight: 1.6, color: "text.secondary" }}>
+                                            {patientSummaryResponse?.one_liner || "No summary available"}
+                                        </Typography>
                                     </Paper>
 
-                                    {/* Allergies */}
-                                    <Paper sx={{
-                                        p: 2,
-                                        borderRadius: 3,
-                                        boxShadow: 3,
-                                        flex: 1,
-                                        background: "linear-gradient(135deg, #fff3e0 0%, #ffcc80 100%)",
-                                        border: "1px solid #ffb74d"
-                                    }}>
-                                        <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1, color: "#ef6c00" }}>
-                                            ⚠️ Allergies
-                                        </Typography>
-                                        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-                                            {patientSummaryResponse?.allergies?.map((allergy, index) => (
-                                                <Box key={index} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                                    <Box sx={{
-                                                        width: 8,
-                                                        height: 8,
-                                                        borderRadius: "50%",
-                                                        bgcolor: "#ff9800",
-                                                        flexShrink: 0,
-                                                        boxShadow: "0 2px 4px rgba(255, 152, 0, 0.3)"
-                                                    }} />
-                                                    <Typography variant="body2"
-                                                        sx={{ fontSize: "13px", color: "#424242" }}>
-                                                        <strong>{allergy.substance}</strong> - {allergy.reaction}
-                                                    </Typography>
-                                                </Box>
-                                            )) || <Typography>No allergies reported</Typography>}
-                                        </Box>
-                                    </Paper>
-                                </Box>
-
-                                {/* Medications and Recent Encounters Row */}
-                                <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-                                    {/* Medications */}
-                                    <Paper sx={{
-                                        p: 2,
-                                        borderRadius: 3,
-                                        boxShadow: 3,
-                                        flex: 1,
-                                        background: "linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%)",
-                                        border: "1px solid #a5d6a7"
-                                    }}>
-                                        <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1, color: "#2e7d32" }}>
-                                            💊 Medications
-                                        </Typography>
-                                        <Box sx={{
-                                            display: "flex",
-                                            flexDirection: "column",
-                                            gap: 0.8,
-                                            maxHeight: "200px",
-                                            overflowY: "auto"
+                                    {/* Top Problems and Allergies Row */}
+                                    <Box sx={{ display: "flex", gap: 2 }}>
+                                        {/* Top Problems */}
+                                        <Paper sx={{
+                                            p: 2,
+                                            borderRadius: 3,
+                                            flex: 1,
+                                            borderTop: "4px solid #EF4444",
+                                            backgroundColor: "background.paper"
                                         }}>
-                                            {patientSummaryResponse?.medications?.map((med, index) => (
-                                                <Box key={index} sx={{
-                                                    p: 1.5,
-                                                    background: "linear-gradient(135deg, #f1f8e9 0%, #e8f5e8 100%)",
-                                                    borderRadius: 2,
-                                                    border: "1px solid #c8e6c9",
-                                                    boxShadow: "0 1px 3px rgba(0,0,0,0.1)"
-                                                }}>
-                                                    <Box sx={{
-                                                        display: "flex",
-                                                        justifyContent: "space-between",
-                                                        alignItems: "center",
-                                                        mb: 0.5
+                                            <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1, color: "text.primary" }}>
+                                                Top Problems
+                                            </Typography>
+                                            <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+                                                {patientSummaryResponse?.top_problems?.map((problem, index) => (
+                                                    <Box key={index} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                                        <Box sx={{
+                                                            width: 8,
+                                                            height: 8,
+                                                            borderRadius: "50%",
+                                                            bgcolor: "#f44336",
+                                                            flexShrink: 0,
+                                                            boxShadow: "0 2px 4px rgba(244, 67, 54, 0.3)"
+                                                        }} />
+                                                        <Typography variant="body2"
+                                                            sx={{ fontSize: "13px", color: "#424242" }}>
+                                                            {problem}
+                                                        </Typography>
+                                                    </Box>
+                                                )) || <Typography>No problems found</Typography>}
+                                            </Box>
+                                        </Paper>
+
+                                        {/* Allergies */}
+                                        <Paper sx={{
+                                            p: 2,
+                                            borderRadius: 3,
+                                            flex: 1,
+                                            borderTop: "4px solid #F59E0B",
+                                            backgroundColor: "background.paper"
+                                        }}>
+                                            <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1, color: "text.primary" }}>
+                                                Allergies
+                                            </Typography>
+                                            <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+                                                {patientSummaryResponse?.allergies?.map((allergy, index) => (
+                                                    <Box key={index} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                                        <Box sx={{
+                                                            width: 8,
+                                                            height: 8,
+                                                            borderRadius: "50%",
+                                                            bgcolor: "#ff9800",
+                                                            flexShrink: 0,
+                                                            boxShadow: "0 2px 4px rgba(255, 152, 0, 0.3)"
+                                                        }} />
+                                                        <Typography variant="body2"
+                                                            sx={{ fontSize: "13px", color: "#424242" }}>
+                                                            <strong>{allergy.substance}</strong> - {allergy.reaction}
+                                                        </Typography>
+                                                    </Box>
+                                                )) || <Typography>No allergies reported</Typography>}
+                                            </Box>
+                                        </Paper>
+                                    </Box>
+
+                                    {/* Medications and Recent Encounters Row */}
+                                    <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+                                        {/* Medications */}
+                                        <Paper sx={{
+                                            p: 2,
+                                            borderRadius: 3,
+                                            flex: 1,
+                                            borderTop: "4px solid #22C55E",
+                                            backgroundColor: "background.paper"
+                                        }}>
+                                            <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1, color: "text.primary" }}>
+                                                Medications
+                                            </Typography>
+                                            <Box sx={{
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                gap: 0.8,
+                                                maxHeight: "320px", // Height for approximately 4 items
+                                                overflowY: "auto",
+                                                overflowX: "hidden",
+                                                pr: 1, // Right padding for scrollbar space
+                                                "&::-webkit-scrollbar": {
+                                                    width: "6px",
+                                                },
+                                                "&::-webkit-scrollbar-track": {
+                                                    background: "#F1F5F9",
+                                                    borderRadius: "3px",
+                                                },
+                                                "&::-webkit-scrollbar-thumb": {
+                                                    background: "#CBD5E1",
+                                                    borderRadius: "3px",
+                                                    "&:hover": {
+                                                        background: "#94A3B8",
+                                                    },
+                                                },
+                                            }}>
+                                                {patientSummaryResponse?.medications?.map((med, index) => (
+                                                    <Box key={index} sx={{
+                                                        p: 1.5,
+                                                        background: "linear-gradient(135deg,rgb(176, 255, 205) 0%,rgb(255, 255, 255) 100%)",
+                                                        borderRadius: 2,
+                                                        border: "1px solid #DCFCE7",
+                                                        borderLeft: "3px solid #22C55E",
+                                                        boxShadow: "0 1px 3px rgba(22, 19, 19, 0.04)",
+                                                        transition: "all 0.2s ease",
+                                                        "&:hover": {
+                                                            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                                                            transform: "translateY(-1px)",
+                                                        }
+                                                    }}>
+                                                        <Box sx={{
+                                                            display: "flex",
+                                                            justifyContent: "space-between",
+                                                            alignItems: "center",
+                                                            mb: 0.5
+                                                        }}>
+                                                            <Typography variant="body2" sx={{
+                                                                fontSize: "13px",
+                                                                fontWeight: "bold",
+                                                                color: "#0F172A",
+                                                                fontFamily: "Poppins"
+                                                            }}>
+                                                                {med.name}
+                                                            </Typography>
+                                                            <Box sx={{
+                                                                px: 1.2,
+                                                                py: 0.3,
+                                                                borderRadius: 2,
+                                                                bgcolor: med.status === "active" ? "#DCFCE7" : "#FEE2E2",
+                                                                color: med.status === "active" ? "#22C55E" : "#EF4444",
+                                                                fontSize: "11px",
+                                                                fontWeight: "bold",
+                                                                fontFamily: "Poppins",
+                                                                border: med.status === "active" ? "1px solid #DCFCE7" : "1px solid #FEE2E2"
+                                                            }}>
+                                                                {med.status}
+                                                            </Box>
+                                                        </Box>
+                                                        <Typography variant="body2"
+                                                            sx={{
+                                                                fontSize: "12px",
+                                                                color: "#475569",
+                                                                mb: 0.3,
+                                                                fontFamily: "Poppins"
+                                                            }}>
+                                                            {med.dosage}
+                                                        </Typography>
+                                                        <Typography variant="body2"
+                                                            sx={{
+                                                                fontSize: "11px",
+                                                                color: "#64748B",
+                                                                fontFamily: "Poppins",
+                                                                fontWeight: 500
+                                                            }}>
+                                                            Start: {med.start || "Unknown"}
+                                                        </Typography>
+                                                    </Box>
+                                                )) || <Typography>No medications found</Typography>}
+                                            </Box>
+                                        </Paper>
+
+                                        {/* Recent Encounters */}
+                                        <Paper sx={{
+                                            p: 2,
+                                            borderRadius: 3,
+                                            flex: 1,
+                                            borderTop: "4px solid #7C3AED",
+                                            backgroundColor: "background.paper"
+                                        }}>
+                                            <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1, color: "text.primary" }}>
+                                                Recent Encounters
+                                            </Typography>
+                                            <Box sx={{
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                gap: 0.8,
+                                                maxHeight: "320px", // Height for approximately 4 items
+                                                overflowY: "auto",
+                                                overflowX: "hidden",
+                                                pr: 1, // Right padding for scrollbar space
+                                                "&::-webkit-scrollbar": {
+                                                    width: "6px",
+                                                },
+                                                "&::-webkit-scrollbar-track": {
+                                                    background: "#F1F5F9",
+                                                    borderRadius: "3px",
+                                                },
+                                                "&::-webkit-scrollbar-thumb": {
+                                                    background: "#CBD5E1",
+                                                    borderRadius: "3px",
+                                                    "&:hover": {
+                                                        background: "#94A3B8",
+                                                    },
+                                                },
+                                            }}>
+                                                {patientSummaryResponse?.recent_encounters?.map((encounter, index) => (
+                                                    <Box key={index} sx={{
+                                                        p: 1.5,
+                                                        background: "linear-gradient(135deg,rgb(221, 202, 255) 0%,rgb(255, 255, 255) 100%)",
+                                                        borderRadius: 2,
+                                                        border: "1px solid #EDE9FE",
+                                                        borderLeft: "3px solid #7C3AED",
+                                                        boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+                                                        transition: "all 0.2s ease",
+                                                        "&:hover": {
+                                                            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                                                            transform: "translateY(-1px)",
+                                                        }
                                                     }}>
                                                         <Typography variant="body2" sx={{
                                                             fontSize: "13px",
                                                             fontWeight: "bold",
-                                                            color: "#1b5e20"
+                                                            color: "#0F172A",
+                                                            mb: 0.8,
+                                                            fontFamily: "Poppins"
                                                         }}>
-                                                            {med.name}
+                                                            {encounter.encounter}
                                                         </Typography>
-                                                        <Box sx={{
-                                                            px: 1.2,
-                                                            py: 0.3,
-                                                            borderRadius: 2,
-                                                            bgcolor: med.status === "active" ? "#c8e6c9" : "#ffcdd2",
-                                                            color: med.status === "active" ? "#1b5e20" : "#c62828",
-                                                            fontSize: "11px",
-                                                            fontWeight: "bold",
-                                                            border: med.status === "active" ? "1px solid #a5d6a7" : "1px solid #ffab91"
-                                                        }}>
-                                                            {med.status}
-                                                        </Box>
+                                                        <Typography variant="body2"
+                                                            sx={{
+                                                                fontSize: "12px",
+                                                                color: "#475569",
+                                                                mb: 0.5,
+                                                                fontFamily: "Poppins"
+                                                            }}>
+                                                            <strong style={{ color: "#64748B" }}>Date:</strong> {encounter.date}
+                                                        </Typography>
+                                                        <Typography variant="body2"
+                                                            sx={{
+                                                                fontSize: "12px",
+                                                                color: "#475569",
+                                                                mb: 0.5,
+                                                                fontFamily: "Poppins"
+                                                            }}>
+                                                            <strong style={{ color: "#64748B" }}>Reason:</strong> {encounter.reason}
+                                                        </Typography>
+                                                        <Typography variant="body2"
+                                                            sx={{
+                                                                fontSize: "12px",
+                                                                color: "#475569",
+                                                                fontFamily: "Poppins"
+                                                            }}>
+                                                            <strong style={{ color: "#64748B" }}>Outcome:</strong> {encounter.outcome}
+                                                        </Typography>
                                                     </Box>
-                                                    <Typography variant="body2"
-                                                        sx={{ fontSize: "12px", color: "#424242", mb: 0.3 }}>
-                                                        {med.dosage}
-                                                    </Typography>
-                                                    <Typography variant="body2"
-                                                        sx={{ fontSize: "11px", color: "#666666" }}>
-                                                        Start: {med.start || "Unknown"}
-                                                    </Typography>
-                                                </Box>
-                                            )) || <Typography>No medications found</Typography>}
-                                        </Box>
-                                    </Paper>
-
-                                    {/* Recent Encounters */}
-                                    <Paper sx={{
-                                        p: 2,
-                                        borderRadius: 3,
-                                        boxShadow: 3,
-                                        flex: 1,
-                                        background: "linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%)",
-                                        border: "1px solid #ce93d8"
-                                    }}>
-                                        <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1, color: "#7b1fa2" }}>
-                                            🏥 Recent Encounters
-                                        </Typography>
-                                        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.8 }}>
-                                            {patientSummaryResponse?.recent_encounters?.map((encounter, index) => (
-                                                <Box key={index} sx={{
-                                                    p: 1.5,
-                                                    background: "linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%)",
-                                                    borderRadius: 2,
-                                                    border: "1px solid #f8bbd9",
-                                                    boxShadow: "0 1px 3px rgba(0,0,0,0.1)"
-                                                }}>
-                                                    <Typography variant="body2" sx={{
-                                                        fontSize: "12px",
-                                                        fontWeight: "bold",
-                                                        color: "#4a148c",
-                                                        mb: 0.3
-                                                    }}>
-                                                        {encounter.encounter}
-                                                    </Typography>
-                                                    <Typography variant="body2"
-                                                        sx={{ fontSize: "11px", color: "#424242", mb: 0.3 }}>
-                                                        <strong>Date:</strong> {encounter.date}
-                                                    </Typography>
-                                                    <Typography variant="body2"
-                                                        sx={{ fontSize: "11px", color: "#424242", mb: 0.3 }}>
-                                                        <strong>Reason:</strong> {encounter.reason}
-                                                    </Typography>
-                                                    <Typography variant="body2"
-                                                        sx={{ fontSize: "11px", color: "#424242" }}>
-                                                        <strong>Outcome:</strong> {encounter.outcome}
-                                                    </Typography>
-                                                </Box>
-                                            )) || <Typography>No recent encounters found</Typography>}
-                                        </Box>
-                                    </Paper>
+                                                )) || <Typography>No recent encounters found</Typography>}
+                                            </Box>
+                                        </Paper>
+                                    </Box>
                                 </Box>
                             </Box>
-                        </Box>
 
-                        {/* Right side - Medical Timeline */}
-                        <Box sx={{
-                            width: 400,
-                            display: "flex",
-                            flexDirection: "column",
-                            height: "100%",
-                            minHeight: "120vh"
-                        }}>
-                            <Paper
-                                sx={{
-                                    borderRadius: 3,
-                                    boxShadow: 3,
-                                    overflow: "hidden",
-                                    height: "100%",
-                                    minHeight: "120vh",
-                                    display: "flex",
-                                    flexDirection: "column",
-                                }}
-                            >
-                                {/* Timeline Header */}
-                                <Box
+                            {/* Right Column - Medical Timeline */}
+                            <Box sx={{
+                                width: 400,
+                                display: "flex",
+                                flexDirection: "column",
+                                height: "fit-content",
+                                maxHeight: "700px"
+                            }}>
+                                <Paper
                                     sx={{
-                                        p: 2,
-                                        borderBottom: 1,
-                                        borderColor: "divider",
-                                        flexShrink: 0
+                                        borderRadius: 3,
+                                        borderTop: "4px solid #1E88E5",
+                                        backgroundColor: "background.paper",
+                                        overflow: "hidden",
+                                        height: "100%",
+                                        maxHeight: "700px",
+                                        display: "flex",
+                                        flexDirection: "column",
                                     }}
                                 >
-                                    <Typography variant="h6" sx={{ fontWeight: "bold", fontSize: "16px" }}>
-                                        Medical Timeline
-                                    </Typography>
-                                </Box>
+                                    {/* Timeline Header with Month Selector */}
+                                    <Box
+                                        sx={{
+                                            p: 2,
+                                            borderBottom: 1,
+                                            borderColor: "divider",
+                                            flexShrink: 0,
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "space-between"
+                                        }}
+                                    >
+                                        <Typography variant="h6" sx={{ fontWeight: "bold", fontSize: "16px", color: "text.primary" }}>
+                                            Medical Timeline
+                                        </Typography>
+                                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                            <Typography variant="body2" sx={{ fontWeight: "bold", color: "text.primary" }}>
+                                                September 2020
+                                            </Typography>
+                                        </Box>
+                                    </Box>
 
-                                {/* Timeline Content */}
-                                <Box sx={{
-                                    flex: 1,
-                                    overflow: "auto",
-                                    minHeight: "calc(120vh - 80px)"
-                                }}>
-                                    <MedicalTimeline
-                                        patientId={patient._id} />
-                                </Box>
-                            </Paper>
+                                    {/* Timeline Content */}
+                                    <Box sx={{
+                                        flex: 1,
+                                        overflow: "auto",
+                                        maxHeight: "600px" // Match the MedicalTimeline component
+                                    }}>
+                                        <MedicalTimeline
+                                            patientId={patient._id} />
+                                    </Box>
+                                </Paper>
+                            </Box>
                         </Box>
                     </Box>
                 )}
@@ -466,13 +500,13 @@ export default function TabsPanel({ patient }) {
                     }}>
                         {/* Trends Title */}
                         <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                            <Typography variant="h5" sx={{ fontWeight: "bold", fontSize: "20px" }}>
-                                📊 Trends & Analytics - {patient.name.first} {patient.name.last}
+                            <Typography variant="h5" sx={{ fontWeight: "bold", fontSize: "20px", color: "text.primary" }}>
+                                Trends & Analytics - {patient.name.first} {patient.name.last}
                             </Typography>
                         </Box>
 
                         {/* All Graphs - 2 per row */}
-                        <Box sx={{ flex: 1, overflow: "auto", p: 1 }}>
+                        <Box sx={{ flex: 1, overflow: "overflow-y", p: 1 }}>
                             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                                 {Array.from({ length: Math.ceil(trendsData.length / 2) }, (_, rowIndex) => {
                                     const leftGraph = trendsData[rowIndex * 2];
@@ -482,37 +516,44 @@ export default function TabsPanel({ patient }) {
                                         <Box key={rowIndex} sx={{ display: "flex", width: "100%", gap: 2, minHeight: "400px" }}>
                                             {/* Left graph - 50% width */}
                                             <Box sx={{ width: "50%", display: "flex", flexDirection: "column" }}>
-                                                <Paper elevation={2} sx={{
-                                                    p: 2,
-                                                    borderRadius: 2,
+                                                <Paper sx={{
+                                                    p: 3,
+                                                    borderRadius: 3,
+                                                    borderTop: "4px solid #1E88E5",
+                                                    backgroundColor: "background.paper",
                                                     height: "100%",
                                                     display: "flex",
                                                     flexDirection: "column"
                                                 }}>
+                                                    {/* Standardized Header */}
                                                     <Box sx={{
                                                         display: 'flex',
-                                                        alignItems: 'flex-start',
+                                                        flexDirection: 'column',
                                                         justifyContent: 'space-between',
                                                         mb: 2,
-                                                        minHeight: "50px"
+                                                        pb: 2,
+                                                        borderBottom: 1,
+                                                        borderColor: 'divider'
                                                     }}>
                                                         <Typography variant="h6" sx={{
                                                             fontWeight: 'bold',
-                                                            fontSize: "14px",
+                                                            fontSize: "16px",
+                                                            color: "text.primary",
                                                             flex: 1,
-                                                            mr: 1
+                                                            mr: 2
                                                         }}>
                                                             {leftGraph?.graph_name}
                                                         </Typography>
                                                         <Typography variant="body2" color="text.secondary" sx={{
-                                                            fontSize: "11px",
-                                                            lineHeight: 1.3,
-                                                            flex: 1,
-                                                            textAlign: "right"
+                                                            fontSize: "12px",
+                                                            lineHeight: 1.4,
+                                                            textAlign: "left",
+                                                            marginTop: 2
                                                         }}>
                                                             {leftGraph?.summary_of_day}
                                                         </Typography>
                                                     </Box>
+                                                    {/* Chart Area */}
                                                     <Box sx={{
                                                         flex: 1,
                                                         minHeight: "320px",
@@ -530,37 +571,44 @@ export default function TabsPanel({ patient }) {
                                             {/* Right graph - 50% width */}
                                             <Box sx={{ width: "50%", display: "flex", flexDirection: "column" }}>
                                                 {rightGraph ? (
-                                                    <Paper elevation={2} sx={{
-                                                        p: 2,
-                                                        borderRadius: 2,
+                                                    <Paper sx={{
+                                                        p: 3,
+                                                        borderRadius: 3,
+                                                        borderTop: "4px solid #1E88E5",
+                                                        backgroundColor: "background.paper",
                                                         height: "100%",
                                                         display: "flex",
                                                         flexDirection: "column"
                                                     }}>
+                                                        {/* Standardized Header */}
                                                         <Box sx={{
                                                             display: 'flex',
-                                                            alignItems: 'flex-start',
+                                                            flexDirection: 'column',
                                                             justifyContent: 'space-between',
                                                             mb: 2,
-                                                            minHeight: "50px"
+                                                            pb: 2,
+                                                            borderBottom: 1,
+                                                            borderColor: 'divider'
                                                         }}>
                                                             <Typography variant="h6" sx={{
                                                                 fontWeight: 'bold',
-                                                                fontSize: "14px",
+                                                                fontSize: "16px",
+                                                                color: "text.primary",
                                                                 flex: 1,
-                                                                mr: 1
+                                                                mr: 2
                                                             }}>
                                                                 {rightGraph.graph_name}
                                                             </Typography>
                                                             <Typography variant="body2" color="text.secondary" sx={{
-                                                                fontSize: "11px",
-                                                                lineHeight: 1.3,
-                                                                flex: 1,
-                                                                textAlign: "right"
+                                                                fontSize: "12px",
+                                                                lineHeight: 1.4,
+                                                                textAlign: "left",
+                                                                marginTop: 2
                                                             }}>
                                                                 {rightGraph.summary_of_day}
                                                             </Typography>
                                                         </Box>
+                                                        {/* Chart Area */}
                                                         <Box sx={{
                                                             flex: 1,
                                                             minHeight: "320px",
@@ -600,14 +648,13 @@ export default function TabsPanel({ patient }) {
                             <Paper sx={{
                                 p: 2,
                                 borderRadius: 3,
-                                boxShadow: 3,
-                                background: "linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%)",
-                                border: "1px solid #bbdefb"
+                                borderTop: "4px solid #1E88E5",
+                                backgroundColor: "background.paper"
                             }}>
-                                <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1, color: "#1565c0" }}>
-                                    🩺 Current Status
+                                <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1, color: "text.primary" }}>
+                                    Current Status
                                 </Typography>
-                                <Typography variant="body2" sx={{ fontSize: "14px", lineHeight: 1.6, color: "#424242" }}>
+                                <Typography variant="body2" sx={{ fontSize: "14px", lineHeight: 1.6, color: "text.secondary" }}>
                                     {healthSignalResponse?.current_status || "No status available"}
                                 </Typography>
                             </Paper>
@@ -616,34 +663,48 @@ export default function TabsPanel({ patient }) {
                             <Paper sx={{
                                 p: 2,
                                 borderRadius: 3,
-                                boxShadow: 3,
-                                background: "linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)",
-                                border: "1px solid #ffcc80"
+                                borderTop: "4px solid #F59E0B",
+                                backgroundColor: "background.paper"
                             }}>
-                                <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1, color: "#ef6c00" }}>
-                                    ⚠️ Risk Scores
+                                <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1.5, color: "text.primary" }}>
+                                    Risk Scores
                                 </Typography>
                                 <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-                                    <Paper sx={{
-                                        px: 2, py: 1, borderRadius: 2, bgcolor: "#c8e6c9",
-                                        color: "#1b5e20", fontWeight: "bold", flex: "1 1 120px", textAlign: "center"
-                                    }}>
-                                        Readmission Risk: {healthSignalResponse?.risk_scores?.readmission_risk || "-"}
-                                    </Paper>
-                                    <Paper sx={{
-                                        px: 2, py: 1, borderRadius: 2, bgcolor: "#ffcdd2",
-                                        color: "#c62828", fontWeight: "bold", flex: "1 1 120px", textAlign: "center"
-                                    }}>
-                                        Mortality Risk: {healthSignalResponse?.risk_scores?.mortality_risk || "-"}
-                                    </Paper>
-                                    {patientSummaryResponse?.status_and_risk_factors?.risk_scores?.other_risks?.length > 0 &&
-                                        <Paper sx={{
-                                            px: 2, py: 1, borderRadius: 2, bgcolor: "#bbdefb",
-                                            color: "#1565c0", fontWeight: "bold", flex: "1 1 120px", textAlign: "center"
-                                        }}>
-                                            Other Risks: {healthSignalResponse?.risk_scores.other_risks.join(", ")}
-                                        </Paper>
-                                    }
+                                    <Chip
+                                        label={`Readmission: ${healthSignalResponse?.risk_scores?.readmission_risk || "Low"}`}
+                                        color="success"
+                                        variant="outlined"
+                                        sx={{
+                                            borderRadius: 2,
+                                            fontWeight: "bold",
+                                            flex: "1 1 160px",
+                                            minHeight: 36
+                                        }}
+                                    />
+                                    <Chip
+                                        label={`Mortality: ${healthSignalResponse?.risk_scores?.mortality_risk || "Low"}`}
+                                        color="error"
+                                        variant="outlined"
+                                        sx={{
+                                            borderRadius: 2,
+                                            fontWeight: "bold",
+                                            flex: "1 1 160px",
+                                            minHeight: 36
+                                        }}
+                                    />
+                                    {healthSignalResponse?.risk_scores?.other_risks?.length > 0 && (
+                                        <Chip
+                                            label={`Other: ${healthSignalResponse.risk_scores.other_risks.join(", ")}`}
+                                            color="primary"
+                                            variant="outlined"
+                                            sx={{
+                                                borderRadius: 2,
+                                                fontWeight: "bold",
+                                                flex: "1 1 160px",
+                                                minHeight: 36
+                                            }}
+                                        />
+                                    )}
                                 </Box>
                             </Paper>
 
@@ -651,12 +712,11 @@ export default function TabsPanel({ patient }) {
                             <Paper sx={{
                                 p: 2,
                                 borderRadius: 3,
-                                boxShadow: 3,
-                                background: "linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)",
-                                border: "1px solid #a5d6a7"
+                                borderTop: "4px solid #22C55E",
+                                backgroundColor: "background.paper"
                             }}>
-                                <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1, color: "#2e7d32" }}>
-                                    🔍 Contributing Factors
+                                <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1.5, color: "text.primary" }}>
+                                    Contributing Factors
                                 </Typography>
                                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                                     {healthSignalResponse?.contributing_factors?.map((factor, index) => (
@@ -669,23 +729,24 @@ export default function TabsPanel({ patient }) {
                                                 width: 8,
                                                 height: 8,
                                                 borderRadius: "50%",
-                                                bgcolor: "#66bb6a",
+                                                bgcolor: "success.main",
                                                 flexShrink: 0
                                             }} />
-                                            <Typography variant="body2" sx={{ fontSize: "14px", color: "#424242" }}>
+                                            <Typography variant="body2" sx={{ fontSize: "14px", color: "text.secondary" }}>
                                                 {factor}
                                             </Typography>
                                         </Box>
-                                    )) || <Typography>No contributing factors found</Typography>}
+                                    )) || <Typography color="text.secondary">No contributing factors found</Typography>}
                                 </Box>
                             </Paper>
                         </Box>
                     </Box>
                 )}
-            </Box>
-            <Box sx={{ display: "flex", height: "100vh", background: "#f8f9fa" }}>
-                <Chatbot
-                    patientId={patient._id} />
+
+                {/* Chatbot Panel */}
+                <Box sx={{ display: "flex", height: "100vh", background: "transparent" }}>
+                    <Chatbot patientId={patient._id} />
+                </Box>
             </Box>
         </Box>
     );
