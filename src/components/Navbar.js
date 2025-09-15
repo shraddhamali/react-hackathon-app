@@ -25,8 +25,18 @@ function Navbar({ showBackButton, onBackClick, title }) {
             }}
         >
             <Toolbar sx={{ px: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                {/* App Name */}
+                {/* App Name with Logo */}
                 <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <img 
+                        src="/medi-synapse-logo-white-bg.png" 
+                        alt="Medi-Synapse Logo"
+                        style={{
+                            height: '40px',
+                            width: 'auto',
+                            marginRight: '12px',
+                            borderRadius: '8px'
+                        }}
+                    />
                     <Typography
                         variant="h6"
                         component="div"
