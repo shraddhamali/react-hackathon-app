@@ -22,6 +22,22 @@ function Navbar({ showBackButton, onBackClick, title }) {
             }}
         >
             <Toolbar>
+                {/* App Name */}
+                <Typography
+                    variant="h6"
+                    component="div"
+                    sx={{
+                        color: '#ffffff',
+                        fontWeight: 'bold',
+                        fontSize: '1.5rem',
+                        mr: 2,
+                        textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
+                        letterSpacing: '0.5px'
+                    }}
+                >
+                    MEDI-SYNAPSE
+                </Typography>
+
                 {/* Back Button */}
                 {showBackButton && (
                     <Button
