@@ -130,7 +130,8 @@ export default function Chatbot({ patientId }) {
               right: 24,
               width: 64,
               height: 64,
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              background: "#FFFFFF",
+              border: "2px solid #667eea",
               color: "white",
               boxShadow: "0 8px 32px rgba(102, 126, 234, 0.4)",
               animation: `${pulse} 2s infinite`,
@@ -143,18 +144,15 @@ export default function Chatbot({ patientId }) {
               transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
             }}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              width="32"
-              height="32"
-              fill="currentColor"
-            >
-              <path d="M12 2C6.48 2 2 6.48 2 12c0 1.54.36 3.04.97 4.37L1 23l6.63-1.97C9.96 21.64 11.46 22 13 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.3 0-2.58-.22-3.77-.64L7 20l-1.36-.36C4.22 18.58 4 17.3 4 16c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8z" />
-              <circle cx="9" cy="12" r="1" />
-              <circle cx="12" cy="12" r="1" />
-              <circle cx="15" cy="12" r="1" />
-            </svg>
+            <img
+              src="/ai-chatbot.png"
+              alt="AI Chatbot"
+              style={{
+                width: "36px",
+                height: "36px",
+                objectFit: "contain",
+              }}
+            />
           </Fab>
         </Tooltip>
       </Zoom>
