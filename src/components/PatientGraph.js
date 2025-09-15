@@ -117,237 +117,7 @@ function PatientGraph({ patient, specificGraph, showKPI = true }) {
             data.sort((a, b) => toDate(a.date) - toDate(b.date));
         }
 
-        if (type === 'line' || graph.graph_name.includes('Weight by Encounter')) {
-            const x = data.map((d) => d.date);
-            const enh = commonTimeSeriesEnhancements(x);
-            return {
-                title: {
-                    text: graph.graph_name,
-                    left: 'center',
-                    top: 10,
-                    textStyle: { fontSize: 14, fontWeight: 'bold' }
-                },
-                tooltip: { trigger: 'axis' },
-                xAxis: {
-                    type: 'category',
-                    data: x,
-                    axisLabel: {
-                        rotate: 45,
-                        fontSize: 10,
-                        interval: 0
-                    }
-                },
-                yAxis: {
-                    type: 'value',
-                    name: 'lb',
-                    nameLocation: 'middle',
-                    nameGap: 30,
-                    nameTextStyle: { fontSize: 12 }
-                },
-                dataZoom: enh.dataZoom,
-                grid: {
-                    left: 60,
-                    right: 30,
-                    top: 50,
-                    bottom: 80,
-                    containLabel: true
-                },
-                animationDuration: enh.animationDuration,
-                animationEasing: enh.animationEasing,
-                series: [{ name: 'Weight', type: 'line', data: data.map((d) => parseFloat(d.value) || 0), ...lineSeriesEnhancements }]
-            };
-        }
-
-        if (type === 'line' && (name.includes('BMI') || data[0]?.bmi !== undefined)) {
-            const x = data.map((d) => d.date);
-            const enh = commonTimeSeriesEnhancements(x);
-            return {
-                title: {
-                    text: name,
-                    left: 'center',
-                    top: 10,
-                    textStyle: { fontSize: 14, fontWeight: 'bold' }
-                },
-                tooltip: { trigger: 'axis' },
-                xAxis: {
-                    type: 'category',
-                    data: x,
-                    axisLabel: {
-                        rotate: 45,
-                        fontSize: 10,
-                        interval: 0
-                    }
-                },
-                yAxis: {
-                    type: 'value',
-                    nameTextStyle: { fontSize: 12 }
-                },
-                dataZoom: enh.dataZoom,
-                grid: {
-                    left: 60,
-                    right: 30,
-                    top: 50,
-                    bottom: 80,
-                    containLabel: true
-                },
-                animationDuration: enh.animationDuration,
-                animationEasing: enh.animationEasing,
-                series: [{ name: 'BMI', type: 'line', data: data.map((d) => d.bmi), ...lineSeriesEnhancements }],
-                markLine: {
-                    silent: true,
-                    lineStyle: { color: '#7c4dff' },
-                    data: [
-                        { yAxis: 25, label: { formatter: 'Overweight 25', position: 'end' } },
-                        { yAxis: 30, label: { formatter: 'Obesity 30', position: 'end' } }
-                    ]
-                }
-            };
-        }
-
-        if (type === 'line' && (name.includes('Blood Pressure') || data[0]?.systolic !== undefined)) {
-            const x = data.map((d) => d.date);
-            const enh = commonTimeSeriesEnhancements(x);
-            return {
-                title: {
-                    text: name,
-                    left: 'center',
-                    top: 10,
-                    textStyle: { fontSize: 14, fontWeight: 'bold' }
-                },
-                tooltip: { trigger: 'axis' },
-                legend: {
-                    data: ['Systolic', 'Diastolic'],
-                    top: 35,
-                    left: 'center',
-                    itemGap: 20
-                },
-                xAxis: {
-                    type: 'category',
-                    data: x,
-                    axisLabel: {
-                        rotate: 45,
-                        fontSize: 10,
-                        interval: 0
-                    }
-                },
-                yAxis: {
-                    type: 'value',
-                    name: 'mmHg',
-                    nameLocation: 'middle',
-                    nameGap: 30,
-                    nameTextStyle: { fontSize: 12 }
-                },
-                dataZoom: enh.dataZoom,
-                grid: {
-                    left: 60,
-                    right: 30,
-                    top: 70,
-                    bottom: 80,
-                    containLabel: true
-                },
-                animationDuration: enh.animationDuration,
-                animationEasing: enh.animationEasing,
-                series: [
-                    { name: 'Systolic', type: 'line', data: data.map((d) => d.systolic), ...lineSeriesEnhancements },
-                    { name: 'Diastolic', type: 'line', data: data.map((d) => d.diastolic), ...lineSeriesEnhancements }
-                ],
-                markLine: {
-                    silent: true,
-                    lineStyle: { color: '#0097a7' },
-                    data: [
-                        { yAxis: 120, label: { formatter: 'SBP 120', position: 'end' } },
-                        { yAxis: 130, label: { formatter: 'SBP 130', position: 'end' } },
-                        { yAxis: 140, label: { formatter: 'SBP 140', position: 'end' } }
-                    ]
-                }
-            };
-        }
-
-        if (type === 'line' && (name.includes('Heart Rate') || data[0]?.heart_rate_bpm !== undefined)) {
-            const x = data.map((d) => d.date);
-            const enh = commonTimeSeriesEnhancements(x);
-            return {
-                title: {
-                    text: name,
-                    left: 'center',
-                    top: 10,
-                    textStyle: { fontSize: 14, fontWeight: 'bold' }
-                },
-                tooltip: { trigger: 'axis' },
-                xAxis: {
-                    type: 'category',
-                    data: x,
-                    axisLabel: {
-                        rotate: 45,
-                        fontSize: 10,
-                        interval: 0
-                    }
-                },
-                yAxis: {
-                    type: 'value',
-                    name: 'bpm',
-                    nameLocation: 'middle',
-                    nameGap: 30,
-                    nameTextStyle: { fontSize: 12 }
-                },
-                dataZoom: enh.dataZoom,
-                grid: {
-                    left: 60,
-                    right: 30,
-                    top: 50,
-                    bottom: 80,
-                    containLabel: true
-                },
-                animationDuration: enh.animationDuration,
-                animationEasing: enh.animationEasing,
-                series: [{ name: 'HR', type: 'line', data: data.map((d) => d.heart_rate_bpm), ...lineSeriesEnhancements }]
-            };
-        }
-
-        if (type === 'line' && (name.includes('Oxygen Saturation') || data[0]?.spo2_percent !== undefined)) {
-            const x = data.map((d) => d.date);
-            const enh = commonTimeSeriesEnhancements(x);
-            return {
-                title: {
-                    text: name,
-                    left: 'center',
-                    top: 10,
-                    textStyle: { fontSize: 14, fontWeight: 'bold' }
-                },
-                tooltip: { trigger: 'axis' },
-                xAxis: {
-                    type: 'category',
-                    data: x,
-                    axisLabel: {
-                        rotate: 45,
-                        fontSize: 10,
-                        interval: 0
-                    }
-                },
-                yAxis: {
-                    type: 'value',
-                    min: 90,
-                    max: 100,
-                    name: '%',
-                    nameLocation: 'middle',
-                    nameGap: 30,
-                    nameTextStyle: { fontSize: 12 }
-                },
-                dataZoom: enh.dataZoom,
-                grid: {
-                    left: 60,
-                    right: 30,
-                    top: 50,
-                    bottom: 80,
-                    containLabel: true
-                },
-                animationDuration: enh.animationDuration,
-                animationEasing: enh.animationEasing,
-                series: [{ name: 'SpO2', type: 'line', data: data.map((d) => d.spo2_percent), ...lineSeriesEnhancements }]
-            };
-        }
-
-        if (type === 'bar' || name.includes('Blood Pressure Category')) {
+        if (type === 'bar') {
             const x = data.map((d) => d.date);
             return {
                 title: {
@@ -396,7 +166,7 @@ function PatientGraph({ patient, specificGraph, showKPI = true }) {
             };
         }
 
-        if (type === 'multi-line' || name.includes('Blood Pressure by Encounter')) {
+        if (type === 'multi-line') {
             const x = data.map((d) => d.date);
             return {
                 title: {
@@ -407,7 +177,7 @@ function PatientGraph({ patient, specificGraph, showKPI = true }) {
                 },
                 tooltip: { trigger: 'axis' },
                 legend: {
-                    data: ['Systolic', 'Diastolic'],
+                    data: [graph.line1, graph.line2],
                     top: 35,
                     left: 'center',
                     itemGap: 20
@@ -440,8 +210,8 @@ function PatientGraph({ patient, specificGraph, showKPI = true }) {
                     containLabel: true
                 },
                 series: [
-                    { name: 'Systolic', type: 'line', data: data.map((d) => parseFloat(d.line_1) || 0), ...lineSeriesEnhancements },
-                    { name: 'Diastolic', type: 'line', data: data.map((d) => parseFloat(d.line_2) || 0), ...lineSeriesEnhancements }
+                    { name: graph.line1, type: 'line', data: data.map((d) => parseFloat(d.line_1) || 0), ...lineSeriesEnhancements },
+                    { name: graph.line2, type: 'line', data: data.map((d) => parseFloat(d.line_2) || 0), ...lineSeriesEnhancements }
                 ]
             };
         }
@@ -483,28 +253,44 @@ function PatientGraph({ patient, specificGraph, showKPI = true }) {
             };
         }
 
-        if (type === 'line' && (name.includes('Risk Score Progression') || data[0]?.risk_score !== undefined)) {
+            if (type === 'line') {
             const x = data.map((d) => d.date);
+            const enh = commonTimeSeriesEnhancements(x);
             return {
-                title: { text: name },
+                title: {
+                    text: graph.graph_name,
+                    left: 'center',
+                    top: 10,
+                    textStyle: { fontSize: 14, fontWeight: 'bold' }
+                },
                 tooltip: { trigger: 'axis' },
-                xAxis: { type: 'category', data: x },
-                yAxis: { type: 'value', name: 'Risk Score' },
-                dataZoom: [
-                    { type: 'inside', xAxisIndex: 0, minSpan: 10 },
-                    { type: 'slider', xAxisIndex: 0 }
-                ],
-                series: [
-                    { name: 'Risk Score', type: 'line', data: data.map((d) => d.risk_score), ...lineSeriesEnhancements }
-                ],
-                markLine: {
-                    silent: true,
-                    lineStyle: { color: '#e74c3c' },
-                    data: [
-                        { yAxis: 10, label: { formatter: 'Low Risk 10' } },
-                        { yAxis: 20, label: { formatter: 'High Risk 20' } }
-                    ]
-                }
+                xAxis: {
+                    type: 'category',
+                    data: x,
+                    axisLabel: {
+                        rotate: 45,
+                        fontSize: 10,
+                        interval: 0
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: graph.y_axis,
+                    nameLocation: 'middle',
+                    nameGap: 30,
+                    nameTextStyle: { fontSize: 12 }
+                },
+                dataZoom: enh.dataZoom,
+                grid: {
+                    left: 60,
+                    right: 30,
+                    top: 50,
+                    bottom: 80,
+                    containLabel: true
+                },
+                animationDuration: enh.animationDuration,
+                animationEasing: enh.animationEasing,
+                series: [{ name: graph.y_axis, type: 'line', data: data.map((d) => parseFloat(d.value) || 0), ...lineSeriesEnhancements }]
             };
         }
 
