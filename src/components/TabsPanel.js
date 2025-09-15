@@ -17,6 +17,50 @@ export default function TabsPanel({ patient }) {
     const [healthSignalResponse, setHealthSignal] = useState([]);
     const [trendsData, setTrendsData] = useState([]);
     const [selectedChartType, setSelectedChartType] = useState('all');
+    const [patientVitalResponse, setPatientVital] = useState([]);
+
+    // helper function
+    const getTrend = (key: string, value: any) => {
+        if (!value) return "stable";
+
+        switch (key) {
+            case "heartbeat": {
+                const num = parseFloat(value);
+                if (num > 100) return "up";
+                if (num < 60) return "down";
+                return "stable";
+            }
+            case "bp": {
+                const { systolic, diastolic } = value;
+                if (systolic > 120 || diastolic > 80) return "up";
+                if (systolic < 90 || diastolic < 60) return "down";
+                return "stable";
+            }
+            case "hb": {
+                const num = parseFloat(value);
+                if (num > 17.5) return "up";
+                if (num < 12) return "down";
+                return "stable";
+            }
+            case "sugar_level": {
+                // if HbA1c given
+                const match = value.match(/([\d.]+)%/);
+                if (match) {
+                    const a1c = parseFloat(match[1]);
+                    if (a1c >= 6.5) return "up";
+                    if (a1c < 4) return "down";
+                    return "stable";
+                }
+                const num = parseFloat(value);
+                if (num > 100) return "up";
+                if (num < 70) return "down";
+                return "stable";
+            }
+            default:
+                return "stable";
+        }
+    };
+
 
 
     useEffect(() => {
@@ -40,13 +84,16 @@ export default function TabsPanel({ patient }) {
                 setTrendsData(patientDetail.ai_response.graphs);
             }
 
+            if (patientDetail && patientDetail.ai_response && patientDetail.ai_response.patient_vitals) {
+                setPatientVital(patientDetail.ai_response.patient_vitals);
+            }
+
         }
     }, [patient]);
 
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
     };
-
 
 
     return (
@@ -92,54 +139,61 @@ export default function TabsPanel({ patient }) {
                         </Box>
 
                         {/* KPI Tiles Row */}
-                        <Box sx={{
-                            display: "flex",
-                            gap: 3,
-                            mb: 3,
-                            width: "100%",
-                            '& > *': {
-                                flex: 1,
-                                minWidth: 0, // Allow cards to shrink
-                            },
-                            '@media (max-width: 1200px)': {
-                                flexWrap: "wrap",
-                                '& > *': {
-                                    flex: '1 1 calc(50% - 12px)',
-                                    minWidth: 200,
+                        {/* KPI Tiles Row */}
+                        <Box
+                            sx={{
+                                display: "flex",
+                                gap: 3,
+                                mb: 3,
+                                width: "100%",
+                                "& > *": {
+                                    flex: 1,
+                                    minWidth: 0, // Allow cards to shrink
                                 },
-                            },
-                            '@media (max-width: 768px)': {
-                                '& > *': {
-                                    flex: '1 1 100%',
+                                "@media (max-width: 1200px)": {
+                                    flexWrap: "wrap",
+                                    "& > *": {
+                                        flex: "1 1 calc(50% - 12px)",
+                                        minWidth: 200,
+                                    },
                                 },
-                            },
-                        }}>
+                                "@media (max-width: 768px)": {
+                                    "& > *": {
+                                        flex: "1 1 100%",
+                                    },
+                                },
+                            }}
+                        >
                             <KpiCard
                                 title="Heartbeat"
-                                value="85"
+                                value={patientVitalResponse?.heartbeat || "--"}
                                 unit="bpm"
-                                trend="up"
+                                trend={getTrend("heartbeat", patientVitalResponse?.heartbeat)}
                                 variant="success"
                             />
                             <KpiCard
                                 title="Blood Pressure"
-                                value="100"
-                                unit="80 mmHg"
-                                trend="stable"
+                                value={
+                                    patientVitalResponse?.bp
+                                        ? `${patientVitalResponse.bp.systolic}/${patientVitalResponse.bp.diastolic}`
+                                        : "--"
+                                }
+                                unit="mmHg"
+                                trend={getTrend("bp", patientVitalResponse?.bp)}
                                 variant="primary"
                             />
                             <KpiCard
                                 title="Haemoglobin"
-                                value="17.5"
+                                value={patientVitalResponse?.hb || "--"}
                                 unit="g/dL"
-                                trend="down"
+                                trend={getTrend("hb", patientVitalResponse?.hb)}
                                 variant="warning"
                             />
                             <KpiCard
                                 title="Sugar Levels"
-                                value="100"
-                                unit="mg/dL"
-                                trend="stable"
+                                value={patientVitalResponse?.sugar_level || "--"}
+                                unit="mg/dl"
+                                trend={getTrend("sugar_level", patientVitalResponse?.sugar_level)}
                                 variant="primary"
                             />
                         </Box>
@@ -152,7 +206,8 @@ export default function TabsPanel({ patient }) {
                         }}>
                             {/* Left Column - Patient Profile Card */}
                             <Box sx={{ width: 350 }}>
-                                <PatientProfileCard patient={patient} />
+                                <PatientProfileCard patient={patient}
+                                                    patientVitals={patientVitalResponse} />
                             </Box>
 
                             {/* Middle Column - Patient Summary */}
