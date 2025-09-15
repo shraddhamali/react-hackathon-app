@@ -1,7 +1,8 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
-import { Logout, ArrowBack } from '@mui/icons-material';
+import { AppBar, Toolbar, Typography, Button, Box, IconButton } from '@mui/material';
+import { Logout, ArrowBack, Notifications, Settings } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import SearchBar from './ui/SearchBar';
 
 function Navbar({ showBackButton, onBackClick, title }) {
     const navigate = useNavigate();
@@ -16,62 +17,76 @@ function Navbar({ showBackButton, onBackClick, title }) {
             position="fixed"
             sx={{
                 zIndex: (theme) => theme.zIndex.drawer + 1,
-                background: 'linear-gradient(135deg, #1976d2, #42a5f5)',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                color: 'white'
+                background: 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(20px)',
+                boxShadow: '0 2px 16px rgba(0, 0, 0, 0.08)',
+                color: '#0F172A',
+                borderBottom: '1px solid rgba(229, 231, 235, 0.5)'
             }}
         >
-            <Toolbar>
+            <Toolbar sx={{ px: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 {/* App Name */}
-                <Typography
-                    variant="h6"
-                    component="div"
-                    sx={{
-                        color: '#ffffff',
-                        fontWeight: 'bold',
-                        fontSize: '1.5rem',
-                        mr: 2,
-                        textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
-                        letterSpacing: '0.5px'
-                    }}
-                >
-                    MEDI-SYNAPSE
-                </Typography>
-
-                {/* Back Button */}
-                {showBackButton && (
-                    <Button
-                        color="inherit"
-                        startIcon={<ArrowBack />}
-                        onClick={onBackClick}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <Typography
+                        variant="h6"
+                        component="div"
                         sx={{
-                            mr: 2,
-                            color: 'white',
+                            color: '#1565C0',
+                            fontWeight: 700,
+                            fontSize: '1.5rem',
+                            mr: 3,
+                            letterSpacing: '0.5px'
+                        }}
+                    >
+                        MEDI-SYNAPSE
+                    </Typography>
+
+                    {/* Back Button */}
+                    {showBackButton && (
+                        <Button
+                            startIcon={<ArrowBack />}
+                            onClick={onBackClick}
+                            sx={{
+                                mr: 3,
+                                color: '#475569',
+                                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                                borderRadius: 12,
+                                px: 2,
+                                py: 1,
+                                '&:hover': {
+                                    backgroundColor: '#E3F2FD',
+                                    color: '#1565C0',
+                                }
+                            }}
+                        >
+                            Back to Table
+                        </Button>
+                    )}  
+
+                </div>
+
+
+                {/* Right Actions */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Button
+                        startIcon={<Logout />}
+                        onClick={handleLogout}
+                        sx={{
+                            ml: 1,
+                            color: '#475569',
+                            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                            borderRadius: 12,
+                            px: 2,
+                            py: 1,
                             '&:hover': {
-                                backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                                backgroundColor: '#FEE2E2',
+                                color: '#EF4444',
                             }
                         }}
                     >
-                        Back to Table
+                        Logout
                     </Button>
-                )}
-
-                {/* Spacer to push logout to the right */}
-                <Box sx={{ flexGrow: 1 }} />
-
-                <Button
-                    color="inherit"
-                    startIcon={<Logout />}
-                    onClick={handleLogout}
-                    sx={{
-                        color: 'white',
-                        '&:hover': {
-                            backgroundColor: 'rgba(255, 255, 255, 0.1)'
-                        }
-                    }}
-                >
-                    Logout
-                </Button>
+                </Box>
             </Toolbar>
         </AppBar>
     );
