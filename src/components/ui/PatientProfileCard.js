@@ -17,13 +17,7 @@ import {
     Payment
 } from '@mui/icons-material';
 
-function PatientProfileCard({ patient }) {
-    // Mock responsible doctors
-    const responsibleDoctors = [
-        { name: "Dr. Smith", avatar: null },
-        { name: "Dr. Johnson", avatar: null },
-        { name: "Dr. Williams", avatar: null },
-    ];
+function PatientProfileCard({ patient, patientVitals }) {
 
     const getPatientInitials = () => {
         if (patient?.name?.first && patient?.name?.last) {
@@ -33,9 +27,20 @@ function PatientProfileCard({ patient }) {
     };
 
     const getStatusColor = () => {
-        // Mock status logic
-        return 'success'; // Could be 'warning', 'error' based on patient condition
+        const stability = patientVitals?.stability?.toLowerCase();
+
+        console.log(patientVitals);
+
+        if (!stability) return "default"; // fallback
+
+        if (stability.includes("high risk")) return "error";   // 🔴 red
+        if (stability.includes("stable")) return "success";    // 🟢 green
+        if (stability.includes("improvement")) return "warning"; // 🟡 yellow
+
+        return "default"; // grey if nothing matches
     };
+
+    console.log(patientVitals)
 
     return (
         <Paper
@@ -72,7 +77,7 @@ function PatientProfileCard({ patient }) {
                             Age: {patient?.age || 'N/A'}
                         </Typography>
                         <Chip
-                            label="Stable"
+                            label={patientVitals?.stability || "--"}
                             size="small"
                             color={getStatusColor()}
                             sx={{ fontSize: '11px', height: 22 }}
@@ -88,32 +93,62 @@ function PatientProfileCard({ patient }) {
 
             {/* Vitals Section */}
             <Box>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1.5, color: 'text.primary' }}>
+                <Typography
+                    variant="h6"
+                    sx={{ fontWeight: "bold", mb: 1.5, color: "text.primary" }}
+                >
                     Quick Vitals
                 </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-                    <Box sx={{ flex: '1 1 120px' }}>
-                        <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', fontSize: '10px' }}>
+
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+                    {/* Blood Type */}
+                    <Box sx={{ flex: "1 1 120px" }}>
+                        <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ textTransform: "uppercase", fontSize: "10px" }}
+                        >
                             Blood Type
                         </Typography>
-                        <Typography variant="body1" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
-                            B+
+                        <Typography
+                            variant="body1"
+                            sx={{ fontWeight: "bold", color: "text.primary" }}
+                        >
+                            {patientVitals?.blood_type || "--"}
                         </Typography>
                     </Box>
-                    <Box sx={{ flex: '1 1 120px' }}>
-                        <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', fontSize: '10px' }}>
+
+                    {/* Height */}
+                    <Box sx={{ flex: "1 1 120px" }}>
+                        <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ textTransform: "uppercase", fontSize: "10px" }}
+                        >
                             Height
                         </Typography>
-                        <Typography variant="body1" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
-                            170 cm
+                        <Typography
+                            variant="body1"
+                            sx={{ fontWeight: "bold", color: "text.primary" }}
+                        >
+                            {patientVitals?.height || "--"}
                         </Typography>
                     </Box>
-                    <Box sx={{ flex: '1 1 120px' }}>
-                        <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', fontSize: '10px' }}>
+
+                    {/* Weight */}
+                    <Box sx={{ flex: "1 1 120px" }}>
+                        <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ textTransform: "uppercase", fontSize: "10px" }}
+                        >
                             Weight
                         </Typography>
-                        <Typography variant="body1" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
-                            80 kg
+                        <Typography
+                            variant="body1"
+                            sx={{ fontWeight: "bold", color: "text.primary" }}
+                        >
+                            {patientVitals?.weight || "--"}
                         </Typography>
                     </Box>
                 </Box>
