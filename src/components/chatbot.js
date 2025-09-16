@@ -91,7 +91,7 @@ export default function Chatbot({ patientId }) {
     setIsTyping(true);
 
     try {
-      const response = await fetch("https://648ae054784a.ngrok-free.app/chat/", {
+      const response = await fetch("https://ee48ff83c809.ngrok-free.app/chat/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

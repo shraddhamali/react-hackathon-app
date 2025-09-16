@@ -22,7 +22,7 @@ export default function PatientTable({ onRowClick }) {
     // Fetch patients function
     const fetchPatients = async () => {
         try {
-            const res = await fetch("https://648ae054784a.ngrok-free.app/patients/");
+            const res = await fetch("https://ee48ff83c809.ngrok-free.app/patients/");
             const data = await res.json();
             const demographics = data.patients.map((p) => ({
                 ...p.ai_response.patient_demographics,
@@ -76,7 +76,7 @@ export default function PatientTable({ onRowClick }) {
                 pdf_base64: base64File,
             };
 
-            const response = await fetch("https://648ae054784a.ngrok-free.app/process-pdf/", {
+            const response = await fetch("https://ee48ff83c809.ngrok-free.app/process-pdf/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
