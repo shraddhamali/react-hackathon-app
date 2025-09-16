@@ -72,12 +72,8 @@ function Login() {
         event.preventDefault();
         setError('');
 
-        const isValid = email.trim().length > 0 && password.trim().length > 0 && termsAccepted;
+        const isValid = email.trim().length > 0 && password.trim().length > 0;
         if (!isValid) {
-            if (!termsAccepted) {
-                setError('Please accept the terms and conditions.');
-                return;
-            }
             setError('Please enter email and password.');
             return;
         }
@@ -305,37 +301,6 @@ function Login() {
                                         },
                                     }
                                 }}
-                            />
-                        </Box>
-
-                        {/* Terms and Conditions */}
-                        <Box sx={{ mb: 3 }}>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={termsAccepted}
-                                        onChange={(e) => setTermsAccepted(e.target.checked)}
-                                        sx={{
-                                            color: '#2563eb',
-                                            '&.Mui-checked': {
-                                                color: '#2563eb',
-                                            },
-                                        }}
-                                    />
-                                }
-                                label={
-                                    <Typography variant="body2" sx={{ color: '#6b7280' }}>
-                                        I agree with{' '}
-                                        <span style={{ color: '#2563eb', textDecoration: 'underline', cursor: 'pointer' }}>
-                                            Terms and Conditions
-                                        </span>{' '}
-                                        and{' '}
-                                        <span style={{ color: '#2563eb', textDecoration: 'underline', cursor: 'pointer' }}>
-                                            Privacy Policies
-                                        </span>{' '}
-                                        of service.
-                                    </Typography>
-                                }
                             />
                         </Box>
 
