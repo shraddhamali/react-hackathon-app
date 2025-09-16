@@ -7,14 +7,43 @@ import {
     Button,
     Typography,
     Alert,
-    Container
+    Container,
+    Checkbox,
+    FormControlLabel
 } from '@mui/material';
-import { HealthAndSafety, MedicalServices } from '@mui/icons-material';
+import {
+    Assessment,
+    Timeline,
+    Analytics,
+    MedicalServices,
+    TrendingUp,
+    Description
+} from '@mui/icons-material';
+
+// FeatureCard Component
+const FeatureCard = ({ icon, title, description }) => {
+    return (
+        <Box sx={{ mb: 4, display: 'flex', alignItems: 'flex-start' }}>
+            <Box sx={{ mr: 3, p: 2, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 2 }}>
+                {icon}
+            </Box>
+            <Box>
+                <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>
+                    {title}
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                    {description}
+                </Typography>
+            </Box>
+        </Box>
+    );
+};
 
 function Login() {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [termsAccepted, setTermsAccepted] = useState(false);
     const [error, setError] = useState('');
 
     // Add CSS animation for gradient effect
@@ -57,7 +86,7 @@ function Login() {
         <Box
             sx={{
                 minHeight: '100vh',
-                background: 'linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 50%, #e8f5e8 100%)',
+                background: 'linear-gradient(135deg, #1a4fa0 0%, #2563eb 50%, #3b82f6 100%)',
                 display: 'flex',
                 position: 'relative',
                 '&::before': {
@@ -68,153 +97,75 @@ function Login() {
                     right: 0,
                     bottom: 0,
                     background: `
-                        radial-gradient(circle at 20% 20%, rgba(25, 118, 210, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 80%, rgba(76, 175, 80, 0.1) 0%, transparent 50%),
-                        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/svg%3E")
+                        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+                        url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='20' cy='20' r='1'/%3E%3C/g%3E%3C/svg%3E")
                     `,
                     zIndex: 0,
                 }
             }}
         >
-            {/* Left Side - Medical Professionals Illustration */}
+            {/* Left Side - Feature Highlights */}
             <Box
                 sx={{
-                    flex: 1,
+                    flex: 1.5,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     position: 'relative',
                     zIndex: 1,
-                    px: 4,
+                    px: 6,
                     py: 8
                 }}
             >
                 <Box
                     sx={{
-                        position: 'relative',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
                         width: '100%',
                         maxWidth: 600,
-                        height: 500,
                     }}
                 >
-                    {/* Background Circle */}
-                    <Box
+                    {/* Platform Title */}
+                    <Typography
+                        variant="h3"
                         sx={{
-                            position: 'absolute',
-                            width: 500,
-                            height: 500,
-                            background: 'linear-gradient(135deg, rgba(25, 118, 210, 0.08), rgba(76, 175, 80, 0.08))',
-                            borderRadius: '50%',
-                            zIndex: 0,
+                            color: 'white',
+                            fontWeight: 'bold',
+                            mb: 2,
+                            textAlign: 'left'
                         }}
+                    >
+                        Medi-Synapse Platform
+                    </Typography>
+
+                    <Typography
+                        variant="h6"
+                        sx={{
+                            color: 'rgba(255,255,255,0.9)',
+                            mb: 6,
+                            textAlign: 'left'
+                        }}
+                    >
+                        Advanced Medical Analytics & Patient Management
+                    </Typography>
+
+                    {/* Feature Cards */}
+                    <FeatureCard
+                        icon={<Assessment sx={{ color: 'white', fontSize: '2rem' }} />}
+                        title="Instant Reports"
+                        description="Generate comprehensive medical reports from patient charts instantly with AI-powered analysis and diagnostic recommendations."
                     />
 
-                    {/* Medical Professionals Image */}
-                    <Box
-                        sx={{
-                            position: 'relative',
-                            zIndex: 2,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            maxWidth: 500,
-                        }}
-                    >
-                        <img
-                            src="/doctor.png"
-                            alt="Medical Professionals"
-                            style={{
-                                width: '100%',
-                                maxWidth: '500px',
-                                height: 'auto',
-                                objectFit: 'contain',
-                                filter: 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1))',
-                            }}
-                        />
-                    </Box>
+                    <FeatureCard
+                        icon={<Timeline sx={{ color: 'white', fontSize: '2rem' }} />}
+                        title="Patient Timeline & Risk Analysis"
+                        description="Access complete patient medical history with interactive timeline, risk assessments, and predictive health insights."
+                    />
 
-                    {/* Medical Cross Symbols in Background */}
-                    <Box
-                        sx={{
-                            position: 'absolute',
-                            top: 60,
-                            left: 60,
-                            fontSize: '1.5rem',
-                            color: '#20b2aa',
-                            opacity: 0.4,
-                            zIndex: 1,
-                        }}
-                    >
-                        ✚
-                    </Box>
-                    <Box
-                        sx={{
-                            position: 'absolute',
-                            top: 120,
-                            right: 100,
-                            fontSize: '1.5rem',
-                            color: '#20b2aa',
-                            opacity: 0.4,
-                            zIndex: 1,
-                        }}
-                    >
-                        ✚
-                    </Box>
-                    <Box
-                        sx={{
-                            position: 'absolute',
-                            bottom: 100,
-                            left: 100,
-                            fontSize: '1.5rem',
-                            color: '#20b2aa',
-                            opacity: 0.4,
-                            zIndex: 1,
-                        }}
-                    >
-                        ✚
-                    </Box>
-                    <Box
-                        sx={{
-                            position: 'absolute',
-                            bottom: 60,
-                            right: 60,
-                            fontSize: '1.5rem',
-                            color: '#20b2aa',
-                            opacity: 0.4,
-                            zIndex: 1,
-                        }}
-                    >
-                        ✚
-                    </Box>
-                    <Box
-                        sx={{
-                            position: 'absolute',
-                            top: 200,
-                            left: 30,
-                            fontSize: '1.5rem',
-                            color: '#20b2aa',
-                            opacity: 0.3,
-                            zIndex: 1,
-                        }}
-                    >
-                        ✚
-                    </Box>
-                    <Box
-                        sx={{
-                            position: 'absolute',
-                            top: 250,
-                            right: 30,
-                            fontSize: '1.5rem',
-                            color: '#20b2aa',
-                            opacity: 0.3,
-                            zIndex: 1,
-                        }}
-                    >
-                        ✚
-                    </Box>
+                    <FeatureCard
+                        icon={<Analytics sx={{ color: 'white', fontSize: '2rem' }} />}
+                        title="Health Analytics & Insights"
+                        description="Advanced health analytics with AI-driven insights, trend analysis, and personalized treatment recommendations."
+                    />
                 </Box>
             </Box>
 
@@ -235,8 +186,8 @@ function Login() {
                     elevation={8}
                     sx={{
                         width: '100%',
-                        maxWidth: 400,
-                        padding: 4,
+                        maxWidth: 500,
+                        padding: 5,
                         borderRadius: 3,
                         background: 'rgba(255, 255, 255, 0.95)',
                         backdropFilter: 'blur(20px)',
@@ -254,10 +205,10 @@ function Login() {
                             }}
                         >
                             <img
-                                src="/logoWithName.png"
-                                alt="MedCare Logo"
+                                src="/medi-synapse-logo-white-bg.png"
+                                alt="Medi-Synapse Logo"
                                 style={{
-                                    height: '150px',
+                                    height: '120px',
                                     maxWidth: '100%',
                                     objectFit: 'contain'
                                 }}
@@ -268,11 +219,21 @@ function Login() {
                             variant="h5"
                             sx={{
                                 fontWeight: 'bold',
-                                color: '#333',
+                                color: '#1f2937',
                                 mb: 1
                             }}
                         >
-                            Welcome Back
+                            Sign in to Medi-Synapse Platform
+                        </Typography>
+
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                color: '#6b7280',
+                                mb: 2
+                            }}
+                        >
+                            Access your medical dashboard and patient insights
                         </Typography>
                     </Box>
 
@@ -293,17 +254,17 @@ function Login() {
                                         borderRadius: 2,
                                         background: 'rgba(255, 255, 255, 0.8)',
                                         '&:hover fieldset': {
-                                            borderColor: '#1976d2',
+                                            borderColor: '#2563eb',
                                         },
                                         '&.Mui-focused fieldset': {
-                                            borderColor: '#1976d2',
+                                            borderColor: '#2563eb',
                                             borderWidth: 2,
                                         },
                                     },
                                     '& .MuiInputLabel-root': {
-                                        color: '#666',
+                                        color: '#6b7280',
                                         '&.Mui-focused': {
-                                            color: '#1976d2',
+                                            color: '#2563eb',
                                         },
                                     }
                                 }}
@@ -326,17 +287,17 @@ function Login() {
                                         borderRadius: 2,
                                         background: 'rgba(255, 255, 255, 0.8)',
                                         '&:hover fieldset': {
-                                            borderColor: '#1976d2',
+                                            borderColor: '#2563eb',
                                         },
                                         '&.Mui-focused fieldset': {
-                                            borderColor: '#1976d2',
+                                            borderColor: '#2563eb',
                                             borderWidth: 2,
                                         },
                                     },
                                     '& .MuiInputLabel-root': {
-                                        color: '#666',
+                                        color: '#6b7280',
                                         '&.Mui-focused': {
-                                            color: '#1976d2',
+                                            color: '#2563eb',
                                         },
                                     }
                                 }}
@@ -349,7 +310,7 @@ function Login() {
                             </Alert>
                         )}
 
-                        {/* Login Button */}
+                        {/* Sign In Button */}
                         <Button
                             type="submit"
                             fullWidth
@@ -360,19 +321,19 @@ function Login() {
                                 fontSize: '1rem',
                                 fontWeight: 'bold',
                                 borderRadius: 2,
-                                background: 'linear-gradient(135deg, #1976d2, #42a5f5)',
-                                textTransform: 'uppercase',
+                                background: 'linear-gradient(135deg, #1a4fa0, #2563eb)',
+                                textTransform: 'none',
                                 letterSpacing: '0.5px',
-                                boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
+                                boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)',
                                 '&:hover': {
-                                    background: 'linear-gradient(135deg, #1565c0, #1976d2)',
+                                    background: 'linear-gradient(135deg, #1e40af, #1a4fa0)',
                                     transform: 'translateY(-1px)',
-                                    boxShadow: '0 6px 16px rgba(25, 118, 210, 0.4)',
+                                    boxShadow: '0 6px 16px rgba(37, 99, 235, 0.4)',
                                 },
                                 transition: 'all 0.3s ease',
                             }}
                         >
-                            Login
+                            Sign In
                         </Button>
                     </form>
 
