@@ -20,6 +20,7 @@ export default function TabsPanel({ patient }) {
     const [patientVitalResponse, setPatientVital] = useState([]);
     const [labsResponse, setLabsResponse] = useState([]);
     const [labReportSummary, setLabReportSummary] = useState(null);
+    
 
     // helper function
     const getTrend = (key, value) => {

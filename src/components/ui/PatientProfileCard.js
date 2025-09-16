@@ -35,7 +35,7 @@ function PatientProfileCard({ patient, patientVitals }) {
 
         if (stability.includes("high risk")) return "error";   // 🔴 red
         if (stability.includes("stable")) return "success";    // 🟢 green
-        if (stability.includes("improvement")) return "warning"; // 🟡 yellow
+        if (stability.includes("moderate risk")) return "warning"; // 🟡 yellow
 
         return "default"; // grey if nothing matches
     };
